@@ -10,9 +10,11 @@
 library(shiny)
 library(ggplot2)
 library(htmlTable)
+library(dplyr)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
 load("./data/serce.RData")
+load("./data/latino.RData")
 
 
 #guambia
@@ -23,7 +25,7 @@ currentDataset = censoFil
 # Define server logic required to draw a histogram
 shinyServer(function(input, output,session) {
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
-  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"="dt")
+  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino)
   
     dataSet <- eventReactive(input$selectorDatos,{
       
@@ -32,15 +34,12 @@ shinyServer(function(input, output,session) {
     
   })
     
-    # var1 <- eventReactive(input$var1, {
-    #   x=dataSet()
-    #   x[,input$var1]
-    # })
-    # 
-    data <- eventReactive(input$goButton,{
+
+    #--- cargar data() ----
+        data <- eventReactive(input$goButton,{
       x=dataSet()
       if (!is.null(input$var1)) {
-        v1=x[,input$var1]
+        v1=pull(x,input$var1) #when data is tibble, this makes v1 a vector, not a 1-d tibble...
         v1name=input$var1
       }
       else {
@@ -49,7 +48,7 @@ shinyServer(function(input, output,session) {
       }
       if (input$var2!="") {
         #print(input$var2)
-        v2=x[,input$var2]
+        v2=pull(x,input$var2)
         v2name=input$var2
       }
       else {
@@ -63,11 +62,16 @@ shinyServer(function(input, output,session) {
     }
     )
     
+
+    #--- cargar output.anali ----
     output$anali <- eventReactive(input$goButton,{
       input$analisis
     })
     outputOptions(output, "anali", suspendWhenHidden = FALSE)
     
+    
+    
+    #--- cargar struct() ----
     struct <- eventReactive(dataSet(),{
       a=unlist(lapply(dataSet(),class))
       b=(lapply(dataSet(),levels))
@@ -77,35 +81,20 @@ shinyServer(function(input, output,session) {
     
     
     
-    # var2 <- eventReactive(input$var2, {
-    #   x=dataSet()
-    #   x[,input$var2]
-    #   
-    # })
+     
+    #--- actualizar valores de var-selector1 ---- fix: parece innecesario
     
-    
-    # actualizar valores de
     observeEvent(dataSet(), {
-      #esto debería ser algo con dataSet
       varsCDs=colnames(dataSet())
       updateSelectInput(session, "var1", choices = varsCDs)
-      #updateSelectInput(session, "var2", choices = c(varsCDs[!(varsCDs %in% input$var1)] ))
     })
     
-    # observeEvent(input$var1,{
-    #   varsCDs=colnames(dataSet())
-    #   updateSelectInput(session, "var2", choices = c(varsCDs[!(varsCDs %in% input$var1)] ))
-    # }) 
-    # 
-    #actualizar la lista de valores posibles de var2
-#    c("Ver datos"="ver","Descriptivo"="descriptivo","Histograma"="histograma",
- #     "Tabla de frecuencias univariada"="tablaF1","Tabla de frecuencias bivariada"="tablaF2",
-#    "Gráfico de barras"="gbar","Diagrama de caja"="boxplot","Gráfico de dispersión"="dispersion"))
-
+    #--- trigger de actualizador var-selector 1y2 ----
     observeEvent(input$analisis,{
       updateVariableInputs()
     })
     
+    #--- actualizar valores de var-selector1y2 ----
     updateVariableInputs <- function(){
       varsCDs=colnames(dataSet())
       nums=struct()[[3]] #variables numericas
@@ -119,7 +108,7 @@ shinyServer(function(input, output,session) {
       updateSelectInput(session, "var2", choices = c(varsCDs[elegibles2] ))
     }
     
-    # actualizar tabla de sumario
+    #---- actualizar tabla de sumario ----
     output$summaryTable <- renderTable({
       a=struct()[[1]]
       b=struct()[[2]]
@@ -130,10 +119,14 @@ shinyServer(function(input, output,session) {
       max = (lapply(dataSet()[,numericas],max,na.rm=T))
       
       niveles=unlist(lapply(b,function(x) if (!is.null(x)) { paste(x,collapse = ", ") }))
-      
+      etiquetas=unlist(lapply(dataSet(),function(x) {
+        f=attributes(x)$label
+        ifelse(is.null(f),"",f)}))
       minMax = paste(mins,max,sep="-")
-      
-      sumario = data.frame(Variable=names(a),Tipo.de.variable=a)
+      print(etiquetas)
+      sumario = data.frame(Variable=names(a),Descripcion=etiquetas,Tipo.de.variable=a)
+      print(sumario)
+      print(numericas)
       sumario[!numericas,"Valores"]=niveles
       sumario[numericas,"Valores"]=minMax
       sumario
@@ -225,6 +218,8 @@ shinyServer(function(input, output,session) {
       
       # draw the histogram with the specified number of bins
       titulo = paste("Histograma de",input$var1)
+      print(x)
+      print(is.numeric(x))
       hist(x, breaks = bins, col = 'darkgray', border = 'white',xlab = nombre,ylab="Frecuencia",main="Histograma")
       
     }
@@ -286,8 +281,12 @@ shinyServer(function(input, output,session) {
   
   
   output$laTabla <- renderUI({
-     HTML(funcionDeTabla()())
+     HTML(limpiaColspan(funcionDeTabla()()))
   })
+  
+  limpiaColspan <- function(x) {
+    gsub("td colspan='[0-9]*'","td colspan='1'",x)
+  }
   
   
   noPlot <- function(){}
