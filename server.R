@@ -205,8 +205,28 @@ shinyServer(function(input, output,session) {
   }
   
   
-  
-          
+  hacerTablaDescriptiva <- function(){
+    datos = data()[[6]]
+    numericas=struct()[[3]]
+    medias=apply(datos[,numericas],2,mean,na.rm=T)
+    desv=apply(datos[,numericas],2,sd,na.rm=T)
+    qtiles= round(t(apply(datos[,numericas],2,quantile)),2)
+    moda=apply(datos,2,getmode)
+    sumario=data.frame(Variables=colnames(datos))
+    sumario[numericas,"Media"] = round(medias,2)
+    sumario[numericas,"Desvío"] = round(desv,2)
+    sumario[numericas,"Cuartil 1"] = qtiles[,2]
+    sumario[numericas,"Mediana"] = qtiles[,3]
+    sumario[numericas,"Cuartil 3"] = qtiles[,4]
+    sumario[,"Moda"] = moda
+    htmlTable(sumario)
+  }
+
+  getmode <- function(v) {
+    uniqv <- unique(v)
+    uniqv[which.max(tabulate(match(v, uniqv)))]
+  }
+            
     #determina qué gráfica, tabla o análisis a mostrar
   #funciones de gráficas
     hacerHistograma = function() {

@@ -2,12 +2,18 @@ library(foreign)
 library(dplyr)
 library(haven)
 dt=read.spss('../data/darkTriad/Triada Obscura.sav',to.data.frame = T)
-head(dt)
+dt=read_sav('../data/darkTriad/Triada Obscura.sav')
+dt=as_factor(dt)
+View(dt)
 sum(is.na(dt$Refleja2))
 dt=dt[complete.cases(dt),]
 save(dt,file='./data/darkTriad.RData')
 
 serce=read.spss('../data/serce/SERCE - Uruguay - sin missing.sav',to.data.frame = T)
+serce2=read_sav('../data/serce/SERCE - Uruguay - sin missing.sav')
+serce2=as_factor(serce2)
+View(serce2)
+serce=serce2
 save(serce,file="./data/serce.RData")
 
 load('../censo.RData')
