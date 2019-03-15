@@ -87,6 +87,7 @@ shinyServer(function(input, output,session) {
     observeEvent(dataSet(), {
       varsCDs=colnames(dataSet())
       updateSelectInput(session, "var1", choices = varsCDs)
+      updateSelectInput(session, "var2", choices = varsCDs)
     })
     
     #--- trigger de actualizador var-selector 1y2 ----
@@ -123,10 +124,10 @@ shinyServer(function(input, output,session) {
         f=attributes(x)$label
         ifelse(is.null(f),"",f)}))
       minMax = paste(mins,max,sep="-")
-      print(etiquetas)
+      #print(etiquetas)
       sumario = data.frame(Variable=names(a),Descripcion=etiquetas,Tipo.de.variable=a)
-      print(sumario)
-      print(numericas)
+      #print(sumario)
+      #print(numericas)
       sumario[!numericas,"Valores"]=niveles
       sumario[numericas,"Valores"]=minMax
       sumario
@@ -238,8 +239,8 @@ shinyServer(function(input, output,session) {
       
       # draw the histogram with the specified number of bins
       titulo = paste("Histograma de",input$var1)
-      print(x)
-      print(is.numeric(x))
+      #print(x)
+      #print(is.numeric(x))
       hist(x, breaks = bins, col = 'darkgray', border = 'white',xlab = nombre,ylab="Frecuencia",main="Histograma")
       
     }
