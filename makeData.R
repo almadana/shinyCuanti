@@ -1,6 +1,7 @@
 library(foreign)
 library(dplyr)
 library(haven)
+library(lubridate)
 dt=read.spss('../data/darkTriad/Triada Obscura.sav',to.data.frame = T)
 dt=read_sav('../data/darkTriad/Triada Obscura.sav')
 dt=as_factor(dt)
@@ -22,9 +23,43 @@ colnames(censo)
 
 censo$Num_hijos
 
+
+
+##--- etiquetar niveles de variables ----
+censo$Lugar_Nac = factor(censo$Lugar_Nac)
+levels(censo$Lugar_Nac) = c("Uruguay","Exterior")
+censo$Dep_Nac = factor(censo$Dep_Nac)
+levels(censo$Dep_Nac) = c("Maldonado","Paysandú","Río Negro","Rivera","Rocha","Salto","San José","Soriano",
+                          "Tacuarembó","Treinta y Tres","Montevideo","Artigas","Canelones","Cerro Largo","Colonia","Durazno",
+                          "Flores","Florida","Lavalleja")
+
+levels(censo$País) = c("Uruguay","Argentina","Aruba","Bélgica","Bolivia","Brasil","Canadá","Suiza",
+                       "Chile","Colombia","Costa Rica","Cuba","Alemania","Rep. Dominicana","Egipto","España","Francia","Israel","Italia","México",
+                       "Panamá","Portugal","Paraguay","Rumania","Suecia","Ucrania","EE.UU.","Venezuela")
+
+
+censo$Nro_trabajos = censo$Nro_trabajos -240
+
+censo$Posición_Ocupacional = factor(censo$Posición_Ocupacional)
+levels(censo$Posición_Ocupacional) = c("Directivo o Gerente ","Profesionales y Técnicos","Socio de establecimiento industrial/rural","Socio de Comercio y/o servicio ","Docente / Investigador",
+"Personal de apoyo administrativo y de oficina","Trabajadores de los servicios y vendedores de comercio","Oficiales, operarios y otros oficios","Trabajador Independiente / Ejercicio liberal","Educador",
+"Trabajador Rural","Miembro de las Fuerzas Armadas","Percibe rentas y/o intereses ","Trabajador no remunerado ","Otra ocupación")
+
+
+censo$Único_percibe_ingresos_hogar = factor(censo$Único_percibe_ingresos_hogar)
+levels(censo$Único_percibe_ingresos_hogar)=c("Si","No")
+
+censo$Área_inser_1=factor(censo$Área_inser_1)
+levels(censo$Área_inser_1)=c("Educación (psicopedagogía y problemas de aprendizaje)","Educación (psicología institucional o familiar).","Educación (psicodiagnóstico y psicometría)","Educación (orientación vocacional)","Social-Comunitario público (MIDES, Intendencias u otra institución)","Social-Comunitario privado (ONG, asociaciones civiles, etc)","Institucional-organizacional (RRHH)","Institucional-organizacional (otro)","Consultorías privadas (mercadeo, asesoramiento  a organizaciones internacionales,   asesoramiento a ONG)","Clínica privada (psicoterapia)","Clínica privada (psicodiagnóstico y evaluación)","Clínica privada: (otro)","Salud mental público (primer nivel)","Salud mental público (segundo nivel)","Salud mental público (tercer nivel)","Salud mental privado (primer nivel)","Salud mental privado (segundo nivel)","Salud mental privado (tercer nivel)","Salud (Cuidados paliativos, profilaxis, otros)","Docencia Universidad pública (docencia, investigación, extensión)","Docencia Universidad privada (docencia, investigación)","Docencia secundaria pública","Docencia secundaria privada","Docencia en otras instituciones (organizaciones científicas, etc.)","Subsector privado del mutualismo y seguros privados","Subsector público ASSE","Judicial (Forense)","Psicología Política","Psicología del Deporte","Psicología Ambiental","Publicidad y marketing")
+
+censo$Vivienda_Ud_es=factor(censo$Vivienda_Ud_es)
+levels(censo$Vivienda_Ud_es)=c("Propietario y la está pagando","Propietario y ya la pagó","Miembro de cooperativa de ayuda mutua","Inquilino o arrendatario","Ocupante gratuito (se la prestaron) ","Ocupante sin permiso del propietario","Por relación de dependencia (trabajo)","Otro")
+
 censoFil=censo %>% 
   select(Sexo,Edad,Lugar_Nac,Dep_Nac,País,Nro_trabajos,Estado_conyugal,Num_hijos,Posición_Ocupacional,Único_percibe_ingresos_hogar,Área_inser_1,Vivienda_Ud_es)
 sum( complete.cases(censoFil))
+
+
 censoFil = censoFil[complete.cases(censoFil),]
 View(censoFil)
 save(censoFil,file="./data/censo.RData")
@@ -44,11 +79,28 @@ levels(encuesta$Trabaja)=c("Sí","No","Ns/nc")
 levels(encuesta$Salario)=c("Sin salario","Entre 1 y 4.999","Entre 5.000 y 9.999","Entre 10.000 y 29.999","Más de 30.000","Ns/nc")
 levels(encuesta$Horas.sueño)
 
+
+
 encuesta$RangoEdad=sapply(encuesta$Edad,function(x) {ifelse(x<25,"Menos de 25 años",ifelse(x<30, "Entre 26 y 30 años",ifelse(x<35,"Entre 31 y 34 años", "35 años o más" ) ) )})
 
+encuesta$horas.sueño.hms = hms(encuesta$Horas.sueño)
 
-encuesta1=encuesta[,c(2,3,4,6,7,8,15,18)]
+horaMal = (encuesta$horas.sueño.hms < hms("2:00:00")) | (encuesta$horas.sueño.hms > hms("15:00:00"))
+sum(horaMal)
+
+encuesta = encuesta[!horaMal,]
+encuesta$horas.sueño=round ( period_to_seconds(encuesta$horas.sueño.hms) / 3600 , 2) # pasar a segundos, luego a horas, y luego redondear resultado
+
+
+encuesta$Escala.satisfaccion.vida = encuesta %>% select(contains("ESV")) %>%
+  transmute(Escala.satisfaccion.vida = rowSums(.))
+
+colnames(encuesta)
+
+
+encuesta1=encuesta[,c(2,3,4,6,7,8,15,18,20,21)]
 table(encuesta1$RangoEdad,encuesta1$Trabaja)
+save(encuesta1,file="./data/encuesta.RData")
 
 
 ### Latinobarómetro

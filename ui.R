@@ -11,6 +11,7 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme="cuanti.css",
+                  
   
   # Application title
   titlePanel("Panel de análsis de datos de CUANTI"),
@@ -18,7 +19,7 @@ shinyUI(fluidPage(theme="cuanti.css",
     column(4,
            wellPanel("Datos",
                      selectInput("selectorDatos","Elegir base de datos",
-                                 c("SERCE"="serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
+                                 c("SERCE"="serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti"),
                                  selected = "")
                      )
            ),
@@ -81,12 +82,12 @@ shinyUI(fluidPage(theme="cuanti.css",
                                     "Leyenda:",
                                     c("izquierda","derecha"))
       ),
-      conditionalPanel("output.anali == 'tablaF2'",
+      conditionalPanel("output.anali == 'tablaF2' || output.anali=='gbar'",
                        radioButtons("freq",
                                     "Frecuencias:",
                                     c("absolutas","porcentuales"))
       ),
-      conditionalPanel("output.anali == 'tablaF2' && input.freq == 'porcentuales'",
+      conditionalPanel(" output.anali == 'tablaF2'  && input.freq == 'porcentuales'",
                        radioButtons("margin",
                                     "Porcentajes:",
                                     c("por filas","por columnas"))
@@ -105,6 +106,19 @@ shinyUI(fluidPage(theme="cuanti.css",
                        plotOutput("elPlot")
 #                       textOutput("mensaje")
       )
+      #panel absoluto fijo al fondo
     )
+
+  ),
+  fluidRow(column(12),
+                                div(      style="padding: 8px; border-bottom: 1px solid #CCC; background: #FFFFEE; height=200px",
+                                          img(src='logoCSE.png', align = "left",height="8%",width="8%"),
+                                          HTML("Proyecto CSE 2018 Innovaciones educativas - Desarrollo: Á. Cabana - <a href='https:/github.com/almadana/shinyCuanti'>Repositorio Github</a> - Licencia GPL v4."),
+                                          img(src='logoFPsi.png', align = "right",height="15%",width="15%")
+                                )
+                  
+                  
+                )
   )
-))
+)
+

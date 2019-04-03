@@ -15,6 +15,7 @@ load("./data/censo.RData")
 load("./data/darkTriad.RData")
 load("./data/serce.RData")
 load("./data/latino.RData")
+load("./data/encuesta.RData")
 
 
 #guambia
@@ -25,7 +26,7 @@ currentDataset = censoFil
 # Define server logic required to draw a histogram
 shinyServer(function(input, output,session) {
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
-  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino)
+  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1)
   
     dataSet <- eventReactive(input$selectorDatos,{
       
@@ -116,14 +117,20 @@ shinyServer(function(input, output,session) {
       numericas=struct()[[3]]
       a[a=="numeric"] = "numérica"
       a[a=="factor"] = "categórica"
-      mins = (lapply(dataSet()[,numericas],min,na.rm=T))
-      max = (lapply(dataSet()[,numericas],max,na.rm=T))
+      mins = round((sapply(dataSet()[,numericas],min,na.rm=T)),2)
+      max = round(sapply(dataSet()[,numericas],max,na.rm=T),2)
       
       niveles=unlist(lapply(b,function(x) if (!is.null(x)) { paste(x,collapse = ", ") }))
+      niveles = sapply(niveles,function(x) {
+        if (nchar(x)>50) {
+          x=paste(substr(x,0,50),"...",sep="") }
+        return(x)
+      })
+      
       etiquetas=unlist(lapply(dataSet(),function(x) {
         f=attributes(x)$label
         ifelse(is.null(f),"",f)}))
-      minMax = paste(mins,max,sep="-")
+      minMax = paste(mins,max,sep="---")
       #print(etiquetas)
       sumario = data.frame(Variable=names(a),Descripcion=etiquetas,Tipo.de.variable=a)
       #print(sumario)
@@ -133,6 +140,17 @@ shinyServer(function(input, output,session) {
       sumario
     },spacing="xs")
   
+    umbralRecorte = 50 #máximo número de caracteres para display a full de niveles de variables categóricas
+    recortarCaracteres <- function(x) {
+      if (nhcar(x)>umbralRecorte) {
+        x=paste(substr(x,0,umbralRecorte),"...",sep="")
+      }
+      return(x)
+    }
+    
+    
+    
+    
     #
     #
     # poner visible segundo panel o no
@@ -173,7 +191,7 @@ shinyServer(function(input, output,session) {
     d=rbind(a,b)
     colnames(d)[ncol(d)]="Total"
     d[2,]=d[2,]*100
-    d=round(d,2)
+    d=round(d,1)
     names(attributes(d)$dimnames)<-c("",n)
     rownames(d)=c("Frecuencia absoluta","Frecuencia Porcentual")
     htmlTable(d)
@@ -202,7 +220,7 @@ shinyServer(function(input, output,session) {
     # colnames(a)[ncol(a)]="Total"
     #names(attributes(d)$dimnames)<-c("",n)
     #rownames(d)=c("Frecuencia absoluta","Frecuencia Porcentual")
-    htmlTable(round(a,2))
+    htmlTable(round(a,1))
   }
   
   
@@ -264,15 +282,28 @@ shinyServer(function(input, output,session) {
     hacerGrafBarras = function() {
     if (input$var2==input$var1) {
       nombre=data()[[3]]
-      barplot(table(data()[[1]]),main=nombre)
+      tab=table(data()[[1]])
+      if (input$freq=="porcentuales") {
+        tab=prop.table(tab)
+        tab=tab*100
+      } 
+      barplot(tab,main=nombre)
     }
     else {
       nombre1=data()[[3]]
       nombre2=data()[[4]]
       #print(nombre2)
-      barplot(table(data()[[1]],data()[[2]]),main="Diagrama de caja",beside = input$stacked!="apiladas")
+      tab=table(data()[[1]],data()[[2]])
+      if (input$freq=="porcentuales") {
+        tab=prop.table(tab,2)
+        tab=tab*100
+      } 
+      barplot(tab,beside = input$stacked!="apiladas",xlab = nombre2)
       position=switch(input$leyenda,"izquierda"="topleft","derecha"="topright")
       legend(position,levels(data()[[1]]),fill=gray.colors(length(levels(data()[[1]]))))
+      title(paste("Gráfico de",nombre1,"según",nombre2))
+      
+      #qplot(dt,aes_string(x=a,fill=b))+geom_bar(stat="identity",position = position_dodge())
     }
   }
     
