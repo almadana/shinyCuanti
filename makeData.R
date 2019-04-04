@@ -82,6 +82,7 @@ levels(encuesta$Horas.sueño)
 
 
 encuesta$RangoEdad=sapply(encuesta$Edad,function(x) {ifelse(x<25,"Menos de 25 años",ifelse(x<30, "Entre 26 y 30 años",ifelse(x<35,"Entre 31 y 34 años", "35 años o más" ) ) )})
+encuesta$RangoEdad = factor(encuesta$RangoEdad)
 
 encuesta$horas.sueño.hms = hms(encuesta$Horas.sueño)
 
@@ -92,8 +93,8 @@ encuesta = encuesta[!horaMal,]
 encuesta$horas.sueño=round ( period_to_seconds(encuesta$horas.sueño.hms) / 3600 , 2) # pasar a segundos, luego a horas, y luego redondear resultado
 
 
-encuesta$Escala.satisfaccion.vida = encuesta %>% select(contains("ESV")) %>%
-  transmute(Escala.satisfaccion.vida = rowSums(.))
+encuesta =encuesta %>% 
+  mutate(Escala.satisfaccion.vida = rowSums(select(.,contains("ESV"))) )
 
 colnames(encuesta)
 

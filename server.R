@@ -74,9 +74,9 @@ shinyServer(function(input, output,session) {
     
     #--- cargar struct() ----
     struct <- eventReactive(dataSet(),{
-      a=unlist(lapply(dataSet(),class))
-      b=(lapply(dataSet(),levels))
-      numericas=unlist(lapply(b,is.null))
+        a=unlist(lapply(dataSet(),class))
+        b=(lapply(dataSet(),levels))
+        numericas=unlist(lapply(b,is.null))
       list(a,b,numericas)
     })
     
