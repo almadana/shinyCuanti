@@ -2,3 +2,14 @@ th{
   padding-right: 10px;
   padding-left: 10px;
 } 
+logo{
+  max-height: 50%;
+  max-width: 50%;
+}
+barraPie{
+  height: 150px;
+  padding: 8px; 
+  border-bottom: 1px 
+  solid #CCC; 
+  background: #FFFFEE; 
+}

@@ -110,15 +110,15 @@ shinyUI(fluidPage(theme="cuanti.css",
     )
 
   ),
-  fluidRow(column(12),
-                                div(      style="padding: 8px; border-bottom: 1px solid #CCC; background: #FFFFEE; height=200px",
-                                          img(src='logoCSE.png', align = "left",height="8%",width="8%"),
+#  fluidRow(class="barraPie",
+                                div(      style="padding: 8px; border-bottom: 1px solid #CCC; background: #FFFFEE; height=250px",
+                                          img(src='logoCSE.png', align = "left",width="10%"),
                                           HTML("Proyecto CSE 2018 Innovaciones educativas - Desarrollo: Á. Cabana - <a href='https:/github.com/almadana/shinyCuanti'>Repositorio Github</a> - Licencia GPL v4."),
                                           img(src='logoFPsi.png', align = "right",height="15%",width="15%")
                                 )
                   
                   
-                )
+ #               )
   )
 )
 
