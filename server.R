@@ -11,16 +11,21 @@ library(shiny)
 library(ggplot2)
 library(htmlTable)
 library(dplyr)
+library(GAlogger)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
 load("./data/serce.RData")
 load("./data/latino.RData")
 load("./data/encuesta.RData")
 
+#GA logger settings
+ga_set_tracking_id("UA-136860877-2")
+ga_set_approval(consent = TRUE)
+ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
+
 
 #guambia
 currentDataset = censoFil
-
 
 
 # Define server logic required to draw a histogram
@@ -35,10 +40,15 @@ shinyServer(function(input, output,session) {
     
   })
     
+    
 
     #--- cargar data() ----
         data <- eventReactive(input$goButton,{
       x=dataSet()
+      if (!is.null(muestra())) {
+        print(muestra())
+        x = x[muestra(),]
+      }
       if (!is.null(input$var1)) {
         v1=pull(x,input$var1) #when data is tibble, this makes v1 a vector, not a 1-d tibble...
         v1name=input$var1
@@ -81,9 +91,30 @@ shinyServer(function(input, output,session) {
     })
     
     
+    #--- Actualizar valor de muestreo: ------
+    muestra <- eventReactive(input$sliderMuestra,{
+      N = nrow(dataSet())
+      if (input$muestrear) {
+        updateCheckboxInput(session,"muestrear",label=paste0("Muestrear aleatoriamente un ",input$sliderMuestra,"% de los casos"))
+        #actualizar dataSet
+        print(input$sliderMuestra)
+        nCasos = round(input$sliderMuestra/100*N)
+        print(nCasos)
+        sample(N,nCasos)
+      }
+      else {
+        updateCheckboxInput(session,"muestrear",label="Tomar muestra aleatoria")
+        1:N
+      }
+    }) 
+    
+    output$condition <- eventReactive(input$muestrear,
+      input$muestrear
+    )
+    outputOptions(output, "condition", suspendWhenHidden = FALSE)
     
      
-    #--- actualizar valores de var-selector1 ---- fix: parece innecesario
+    #------ actualizar valores de var-selector1 ---- fix: parece innecesario -----
     
     observeEvent(dataSet(), {
       varsCDs=colnames(dataSet())

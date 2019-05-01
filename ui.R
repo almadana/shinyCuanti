@@ -12,7 +12,8 @@ library(shiny)
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme="cuanti.css",
                   
-  
+  tags$head(tags$script(src="google-analytics.js")),
+
   # Application title
   titlePanel("Panel de análsis de datos de CUANTI"),
   fluidRow(
@@ -42,8 +43,18 @@ shinyUI(fluidPage(theme="cuanti.css",
                                      "Tabla de frecuencias bivariada"="tablaF2",
                                      "Gráfico de barras"="gbar",
                                      "Diagrama de caja"="boxplot",
-                                     "Gráfico de dispersión"="dispersion"))
-    )),
+                                     "Gráfico de dispersión"="dispersion")),
+                       checkboxInput("muestrear",
+                                     label="Tomar muestra aleatoria"
+                                     ),
+                       conditionalPanel(condition="output.condition",
+                         sliderInput("sliderMuestra",
+                                     "Tamaño de la muestra",
+                                     min=1,
+                                     max=100,
+                                     value=10)
+                       )
+    ),
     column(4,wellPanel("Variables",
                       conditionalPanel(
                         condition = "output.dataSelected",
@@ -110,14 +121,14 @@ shinyUI(fluidPage(theme="cuanti.css",
     )
 
   ),
-    fluidRow(class="barraPie",
-          div(style="padding: 8px; border-bottom: 1px solid #CCC; background: #FFFFEE; height=250px",
-              img(src='logoCSE.png', align = "left",width="5%"),
-              HTML("Proyecto CSE 2018 Innovaciones educativas - Desarrollo: Á. Cabana - <a href='https:/github.com/almadana/shinyCuanti'>Repositorio Github</a> - Licencia GPL v4."),
-              img(src='logoFPsi.png', align = "right",height="15%",width="10%")
-            )
-
-
+          div(class="barraPie",
+              
+              span(class="spanner",img(src='logoCSE.png', align = "left",class="logo"),
+                   "Proyecto CSE 2018 Innovaciones educativas - Desarrollo: Á. Cabana - ",
+                    a(href='https:/github.com/almadana/shinyCuanti',"Repositorio Github"," - Licencia GPL v4."),
+                  img(src='logoFPsi.png', align = "right",class="logo")
+              )
+          )
     )
   )
 )
