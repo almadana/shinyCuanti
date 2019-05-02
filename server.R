@@ -21,7 +21,7 @@ load("./data/encuesta.RData")
 #GA logger settings
 ga_set_tracking_id("UA-136860877-2")
 ga_set_approval(consent = TRUE)
-ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
+#ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
 
 
 #guambia

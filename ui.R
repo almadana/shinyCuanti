@@ -11,8 +11,6 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme="cuanti.css",
-                  
-  tags$head(tags$script(src="google-analytics.js")),
 
   # Application title
   titlePanel("Panel de análsis de datos de CUANTI"),
