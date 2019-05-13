@@ -52,20 +52,19 @@ shinyUI(fluidPage(theme="cuanti.css",
                                      max=100,
                                      value=10)
                        )
-    ),
-    column(4,wellPanel("Variables",
+        )),
+    column(6,wellPanel("Variables",
                       conditionalPanel(
                         condition = "output.dataSelected",
                         # placeholders will be replaced from the server
                         selectInput("var1", "Elegir variable 1", "placeholder 1"),
                         selectInput("var2", "Elegir variable 2", NULL)
-                      )
-              ),
-          actionButton("goButton","Analizar!")
+                      ),
+              actionButton("goButton","Analizar!")
+        )
     )
-    
-    
-    ),
+  ),
+  fluidRow(
   sidebarLayout(
     sidebarPanel(
       # Sidebar with some panels
@@ -74,7 +73,8 @@ shinyUI(fluidPage(theme="cuanti.css",
                        "Número de bins:",
                        min = 1,
                        max = 50,
-                       value = 30)
+                       value = 30),
+        checkboxInput("ajusteNormal",label="Ajustar curva normal")
       ), 
       conditionalPanel(condition="output.anali == 'dispersion'",
                        sliderInput("pointSize",

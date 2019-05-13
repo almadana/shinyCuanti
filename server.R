@@ -283,17 +283,22 @@ shinyServer(function(input, output,session) {
   #funciones de gráficas
     hacerHistograma = function() {
       #print(data())
-      x = data()[[1]]
+      d = data()[[1]]
       nombre = data()[[3]]
       # generate bins based on input$bins from ui.R
-      bins <- seq(min(x,na.rm=T), max(x,na.rm=T), length.out = input$bins + 1)
+      bins <- seq(min(d,na.rm=T), max(d,na.rm=T), length.out = input$bins + 1)
       
       # draw the histogram with the specified number of bins
       titulo = paste("Histograma de",input$var1)
-      #print(x)
-      #print(is.numeric(x))
-      hist(x, breaks = bins, col = 'darkgray', border = 'white',xlab = nombre,ylab="Frecuencia",main="Histograma")
-      
+      #print(d)
+      #print(is.numeric(d))
+      if (input$ajusteNormal) {
+        hist(d, breaks = bins, col = 'darkgray', border = 'white',xlab = nombre,ylab="Frecuencia",main="Histograma",prob=T)
+        curve(dnorm(x,mean(d),sd(d)),bins[1],bins[length(bins)],add=T)
+      }
+      else {
+        hist(d, breaks = bins, col = 'darkgray', border = 'white',xlab = nombre,ylab="Frecuencia",main="Histograma",prob=F)
+      }
     }
 
     hacerDispersion = function() {
