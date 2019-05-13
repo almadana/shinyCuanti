@@ -21,15 +21,16 @@ load("./data/encuesta.RData")
 #GA logger settings
 ga_set_tracking_id("UA-136860877-2")
 ga_set_approval(consent = TRUE)
-ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
+
 
 
 #guambia
 currentDataset = censoFil
 
 
-# Define server logic required to draw a histogram
 shinyServer(function(input, output,session) {
+  ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
+  
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
   listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1)
   
@@ -76,6 +77,7 @@ shinyServer(function(input, output,session) {
 
     #--- cargar output.anali ----
     output$anali <- eventReactive(input$goButton,{
+      ga_collect_event(event_category = "Analizar",event_label = "Botón de análisis")
       input$analisis
     })
     outputOptions(output, "anali", suspendWhenHidden = FALSE)
