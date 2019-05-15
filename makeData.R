@@ -112,3 +112,9 @@ latino=as_factor(latino)
 latino$CIUDAD=droplevels(latino$CIUDAD)
 str(latino)
 save(latino,file="./data/latino.RData")
+
+
+#### -- MINI BASE DE DATOS ESTUDIANTES ----
+miniBase = read.csv("../minibase.csv",dec=",")
+head(miniBase)
+save(miniBase,file="./data/miniBase.RData")

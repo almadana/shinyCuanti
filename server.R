@@ -17,6 +17,7 @@ load("./data/darkTriad.RData")
 load("./data/serce.RData")
 load("./data/latino.RData")
 load("./data/encuesta.RData")
+load("./data/miniBase.RData")
 
 #GA logger settings
 ga_set_tracking_id("UA-136860877-2")
@@ -32,7 +33,7 @@ shinyServer(function(input, output,session) {
   ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
-  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1)
+  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase)
   
     dataSet <- eventReactive(input$selectorDatos,{
       

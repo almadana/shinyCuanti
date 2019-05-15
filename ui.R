@@ -18,7 +18,9 @@ shinyUI(fluidPage(theme="cuanti.css",
     column(4,
            wellPanel("Datos",
                      selectInput("selectorDatos","Elegir base de datos",
-                                 c("SERCE"="serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti"),
+                                 c("SERCE"="serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1",
+                                   "Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti",
+                                   "Mini-base de estudiantes de seminarios"="miniBase"),
                                  selected = "")
                      )
            ),
