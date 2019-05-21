@@ -118,3 +118,32 @@ save(latino,file="./data/latino.RData")
 miniBase = read.csv("../minibase.csv",dec=",")
 head(miniBase)
 save(miniBase,file="./data/miniBase.RData")
+
+
+## - music babies ----
+
+
+
+music = read.csv(file = "../data/musicBabies/Mehr Song and Spelke 2016 Experiment 1.csv")
+View(music)
+
+music1 = music %>% 
+  filter(exp1==1) %>% 
+  select("id","female","dad","Baseline_Proportion_Gaze_to_Singer","Test_Proportion_Gaze_to_Singer","Difference_in_Proportion_Looking","age","Estimated_Total_Number_of_Song")
+View(music1)
+
+colnames(music1)
+colnames(music1) = c("Id","Es.mujer","Vino.con.el.padre","Prop.Mirada.Canta.Base","Prop.Mirada.Canta.Test","Dif.Prop.Mirada","edad","Num.canc.estim")
+attributes(music1$Id)$label = "Identificador del bebé"
+attributes(music1$Mujer)$label = "Es mujer?"
+attributes(music1$Vino.con.el.padre)$label = "¿Vino con el padre?"
+attributes(music1$Prop.Mirada.Canta.Base)$label = "Proporción de tiempo que mira a quien (luego) canta la canción conocida. Línea de base"
+attributes(music1$Prop.Mirada.Canta.Test)$label = "Proporción de tiempo que mira a quien canta la canción conocida. Test."
+attributes(music1$Dif.Prop.Mirada)$label = "Diferencia en la proporción de tiempo que mira a quien canta la canción conocida, Test menos línea de base."
+attributes(music1$edad)$label = "Edad en meses"
+attributes(music1$Num.canc.estim)$label = "Número estimado de veces que el bebé escuchó la canción de parte de sus cuidadores."
+
+music1$Mujer = factor(music1$Mujer,labels = c("No","Si"))
+music1$Vino.con.el.padre =  factor(music1$Vino.con.el.padre,labels = c("No","Si"))
+
+save(music1,file="./data/expeCuna.RData")

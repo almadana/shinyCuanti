@@ -18,6 +18,7 @@ load("./data/serce.RData")
 load("./data/latino.RData")
 load("./data/encuesta.RData")
 load("./data/miniBase.RData")
+load("./data/expeCuna.RData")
 
 #GA logger settings
 ga_set_tracking_id("UA-136860877-2")
@@ -33,7 +34,7 @@ shinyServer(function(input, output,session) {
   ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
-  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase)
+  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1)
   
     dataSet <- eventReactive(input$selectorDatos,{
       
@@ -129,6 +130,8 @@ shinyServer(function(input, output,session) {
     observeEvent(input$analisis,{
       updateVariableInputs()
     })
+    
+    
     
     #--- actualizar valores de var-selector1y2 ----
     updateVariableInputs <- function(){
@@ -313,11 +316,25 @@ shinyServer(function(input, output,session) {
       # draw the histogram with the specified number of bins
       #titulo = paste("Histograma de",input$var1)
       plot(x, y,cex = pointSize,xlab = nombre.x,ylab=nombre.y,main="")
-      
+      if (input$tendencia) {
+        abline(lm(y~x))
+      }
     }
     
-    
+    output$coefCorrel1 <- renderText({
+      x = data()[[1]]
+      y = data()[[2]]
+      paste("El coeficiente de correlación de Pearson es:",round(cor(x,y),2))
+    })
         
+    output$pCorrel1 <- renderText({
+      x = data()[[1]]
+      y = data()[[2]]
+      paste("El p-valor de la prueba de hipótesis (nula r=0) es:",round(cor.test(x,y)$p.value,4))
+    })
+    
+    
+    
     hacerGrafBarras = function() {
     if (input$var2==input$var1) {
       nombre=data()[[3]]
@@ -347,17 +364,40 @@ shinyServer(function(input, output,session) {
   }
     
     hacerBoxplot= function() {
+      x=data()[[1]]
+      y=data()[[2]]
+      meanOffset = .45
     if (input$var2==input$var1) {
       nombre=data()[[3]]
-      boxplot(data()[[1]],main=paste("Diagrama de caja de",nombre))
+      mx=mean(x,na.rm=T)
+      boxplot(x,main=paste("Diagrama de caja de",nombre))
+      segments(.6,mx,1.4,mx,col="red")
+      mtext("La línea roja indica la media",1)
     }
     else {
+      nums=struct()[[3]]
       datos=data()[[6]]
       nombre1=data()[[3]]
       nombre2=data()[[4]]
-      #print(nombre2)
-      boxplot(formula(paste(nombre1,nombre2,sep="~")),data=datos,main="Diagrama de caja",xlab=nombre2,ylab=nombre1)
-      
+      if (nums[nombre2]) {
+        #print(nombre2)
+        boxplot(x,y,data=datos,main="Diagrama de caja",xlab="Variable",ylab="Valores",names=c(nombre1,nombre2))
+        mx=mean(x,na.rm = T)
+        my=mean(y,na.rm = T)
+        segments(1-meanOffset,mx,1+meanOffset,mx,col="red")
+        segments(2-meanOffset,my,2+meanOffset,my,col="red")
+        mtext("La líneas rojas indican la media",1)
+      }
+      else {
+        #print(nombre2)
+        mxy = tapply(x,y,function(x) mean(x,na.rm=T))
+        s=1:length(unique(y))
+        xcoords=s-meanOffset
+        xcoords1=s+meanOffset
+        boxplot(formula(paste(nombre1,nombre2,sep="~")),data=datos,main="Diagrama de caja",xlab=nombre2,ylab=nombre1)
+        segments(xcoords[s],mxy[s],xcoords1[s],mxy[s],col="red",lwd=2)
+        mtext("La líneas rojas indican la media",1)
+      }
     }
   }
   

@@ -20,7 +20,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                      selectInput("selectorDatos","Elegir base de datos",
                                  c("SERCE"="serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1",
                                    "Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti",
-                                   "Mini-base de estudiantes de seminarios"="miniBase"),
+                                   "Mini-base de estudiantes de seminarios"="miniBase","Experimento: bebés y melodías"="expeCuna"),
                                  selected = "")
                      )
            ),
@@ -83,7 +83,13 @@ shinyUI(fluidPage(theme="cuanti.css",
                                    "Tamaño de puntos:",
                                    min = 1,
                                    max = 10,
-                                   value = 3)
+                                   value = 3),
+                       checkboxInput("tendencia","Línea de tendencia y coef. de correlación"),
+                       conditionalPanel(condition="input.tendencia",
+          
+                         tags$p(textOutput("coefCorrel1")),
+                         tags$p(textOutput("pCorrel1"))
+                       )
       ),
       conditionalPanel("output.anali == 'gbar'",
                        radioButtons("stacked",
@@ -92,6 +98,8 @@ shinyUI(fluidPage(theme="cuanti.css",
                        radioButtons("leyenda",
                                     "Leyenda:",
                                     c("izquierda","derecha"))
+                       #conditionalPanel(condition="leyenda",
+                        #                )
       ),
       conditionalPanel("output.anali == 'tablaF2' || output.anali=='gbar' ",
                        radioButtons("freq",
