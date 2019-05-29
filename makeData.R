@@ -147,3 +147,89 @@ music1$Mujer = factor(music1$Mujer,labels = c("No","Si"))
 music1$Vino.con.el.padre =  factor(music1$Vino.con.el.padre,labels = c("No","Si"))
 
 save(music1,file="./data/expeCuna.RData")
+
+
+#---- ricos y pobres----
+wealth = read.csv("../data/wealth/Dawtry Sutton and Sibley 2015 Study 1a.csv")
+head(wealth)
+
+wealth$f_s=apply(wealth[,c("fairness","satisfaction")],1,mean)
+
+wealth$redist2_r = 7 - wealth$redist2
+wealth$redist4_r = 7 - wealth$redist4
+
+wealth$redist=apply(wealth[,c("redist1","redist2_r","redist3","redist4_r")],1,mean)
+
+plot(wealth$Social_Circle_Mean_Income,wealth$redist)
+cor.test(wealth$Social_Circle_Mean_Income,wealth$redist)
+cor.test(wealth$redist,wealth$f_s)
+plot(wealth$redist,wealth$f_s)
+
+plot(wealth$f_s,wealth$redist)
+abline(lm(wealth$redist~wealth$f_s))
+
+plot(wealth$f_s,wealth$Household_Income)
+cor.test(wealth$Household_Income,wealth$f_s)
+abline(lm(wealth$Household_Income~wealth$f_s))
+
+
+plot(wealth$redist,wealth$Household_Income)
+cor.test(wealth$Household_Income,wealth$redist)
+abline(lm(wealth$Household_Income~wealth$redist))
+
+wealth2 = mutate(wealth,income3tile = ntile(Household_Income,3))
+wealth2 = mutate(wealth2,political3tile = ntile(Political_Preference,3))
+
+colnames(wealth2)
+wealth3 = wealth2 %>% 
+  select("PS","Household_Income","Population_Inequality_Gini_Index","Social_Circle_Inequality_Gini_Index","f_s","redist","income3tile","political3tile")
+colnames(wealth3)
+
+colnames(wealth3) = c("Sujeto","Ingreso.hogar","Gini_estimado_poblacion","Gini_estimado_circ.social","Igualdad_y_satisfaccion","Redistribucion","Tercil_ingreso_hogar","Orientacion_politica")
+
+wealth3$Tercil_ingreso_hogar = factor(wealth3$Tercil_ingreso_hogar,labels=c("Menor","Medio","Mayor"))
+wealth3$Tercil_orientacion_politica = factor(wealth3$Tercil_orientacion_politica,labels=c("Liberal-Izq","Centro","Conservador-Der"))
+
+attributes(wealth3$Sujeto)$label="Número de participante"
+attributes(wealth3$Ingreso.hogar)$label="Ingreso al hogar"
+attributes(wealth3$Gini_estimado_poblacion)$label="Índice gini de la estimación de distribución de ingreso al hogar en la población de los EEUU"
+attributes(wealth3$Gini_estimado_circ.social)$label="Índice gini de la estimación de distribución de ingreso al hogar en el círculo social del participante"
+attributes(wealth3$Igualdad_y_satisfaccion)$label="Puntuación en la escala de percepción de justicia y satisfacción con la distribución de ingreso actual"
+attributes(wealth3$Redistribucion)$label="Puntuación en la escala de acuerdo con la afirmación 'Creo que el estado debería redistribuir la riqueza a través de impuestos a los más ricos'"
+attributes(wealth3$Tercil_ingreso_hogar)$label = "Nivel de ingreso al hogar (por debajo del primer tercil, entre el primer y segundo tercil, por encima del tercer tercil)"
+attributes(wealth3$Orientacion_politica)$label = "Orientación política (liberal de izquierda, centro, conservador de derecha)"
+
+wealth3=wealth3[complete.cases(wealth3),]
+
+save(wealth3,file="./data/wealth.RData")
+#------ inteligencia -----
+
+inteli = read_sav("../data/inteligencia/alldata/Study1 data.sav")
+inteli$gender.f = factor(inteli$gender)
+levels(inteli$gender.f)
+
+
+inteli4 = read.csv("../data/inteligencia/Schroeder and Epley 2015 Study 4 data.csv")
+head(inteli4)
+inteli4$cond.f = factor(inteli4$CONDITION,labels = c("Transcripción","Audio"))
+
+boxplot(inteli4$Impression_Rating~inteli4$cond.f)
+
+cor(inteli4$Impression_Rating,inteli4$Hire_Rating)
+
+colnames(inteli4)
+View(inteli4)
+
+
+inteli =inteli4 %>% 
+  select(cond.f,Intellect_Rating,Impression_Rating,Hire_Rating,wordcount,time)
+colnames(inteli)
+colnames(inteli)=c("Condición","Puntaje_intelecto","Puntaje_impresion_global","Puntaje_Contratar","num.palabras","tiempo")
+attributes(inteli$Condición)$label = "Transcripción o audio"
+attributes(inteli$Puntaje_intelecto)$label = "Puntuación general del intelecto del evaluado"
+attributes(inteli$Puntaje_impresion_global)$label = "Puntuación de impresión global del evaluado"
+attributes(inteli$Puntaje_Contratar)$label = "Puntuación de qué tan buen candidato para contratar es el evaluado"
+attributes(inteli$num.palabras)$label = "Número de palabras de la presentación"
+attributes(inteli$tiempo)$label = "Tiempo que pasó el evaluador evaluando el candidato"
+
+save(inteli,file="./data/inteligencia.RData")

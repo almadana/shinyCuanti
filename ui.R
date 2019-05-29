@@ -20,7 +20,9 @@ shinyUI(fluidPage(theme="cuanti.css",
                      selectInput("selectorDatos","Elegir base de datos",
                                  c("SERCE"="serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1",
                                    "Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti",
-                                   "Mini-base de estudiantes de seminarios"="miniBase","Experimento: bebés y melodías"="expeCuna"),
+                                   "Mini-base de estudiantes de seminarios"="miniBase","Experimento: bebés y melodías"="expeCuna",
+                                   "Experimento: audio vs. transcripción"="inteligencia",
+                                   "Percepción de desigualdad y riqueza"="riqueza"),
                                  selected = "")
                      )
            ),
