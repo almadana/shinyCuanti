@@ -236,7 +236,7 @@ shinyServer(function(input, output,session) {
     rownames(d)=c("Frecuencia absoluta","Frecuencia Porcentual")
     htmlTable(d)
   }
-  
+  #----------------- Tabla bivariada ---------------------
   hacerTablaF2 <- function() {
     x1=data()[[1]]
     n1=data()[[3]]
@@ -263,6 +263,13 @@ shinyServer(function(input, output,session) {
     htmlTable(round(a,1))
   }
   
+  output$chisq2Text <- renderText({
+    x = data()[[1]]
+    y = data()[[2]]
+    a=chisq.test(x,y)
+    paste("El valor de Chi cuadrado es: ",round(a$statistic,2),"con",a$parameter,"grados de libertad.\n El p-valor es",round(a$p.value,2))
+  })
+
   
   hacerTablaDescriptiva <- function(){
     datos = data()[[6]]

@@ -1,18 +1,15 @@
-.th{
+th {
   padding-right: 10px;
   padding-left: 10px;
-} 
-.logo{
-  height: 95%;
-  object-fit: scale-down;
 }
-.barraPie{
+
+.logo {
+  height: 95%;
+}
+.barraPie {
   background: #FFFFEE; 
-  padding: 8px; 
   border-bottom: 1px solid #CCC; 
   height: 75px;
   line-height: 75px;
   text-align: center;
-}
-.spanner{
 }

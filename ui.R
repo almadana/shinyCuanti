@@ -103,6 +103,13 @@ shinyUI(fluidPage(theme="cuanti.css",
                        #conditionalPanel(condition="leyenda",
                         #                )
       ),
+      conditionalPanel("output.anali == 'tablaF2'",
+                       checkboxInput("chisq2",
+                                    "Prueba Chi cuadrado de independencia:"),
+                       conditionalPanel(condition="input.chisq2",
+                                        tags$p(textOutput("chisq2Text"))
+                       )
+      ),
       conditionalPanel("output.anali == 'tablaF2' || output.anali=='gbar' ",
                        radioButtons("freq",
                                     "Frecuencias:",
