@@ -411,6 +411,28 @@ shinyServer(function(input, output,session) {
     }
   }
   
+    output$studentText <- renderText({
+     # Prueba T de Student para las medias.
+      x=data()[[1]]
+      y=data()[[2]]
+      if (input$var2==input$var1) {
+        a=t.test(x)
+        paste("El valor de t para una muestra es: ",round(a$statistic,2),"\n. El p-valor es: ",round(a$p.value,5))
+      }
+      else{
+        nums=struct()[[3]]
+        nombre2=data()[[4]]
+          if (nums[nombre2]) {
+              a=t.test(x,y,paired = input$pairedStudent)
+              paste("El valor de t para dos muestras",ifelse(input$pairedStudent,"pareadas","independientes"), "es: ",round(a$statistic,5),"\n. El p-valor es: ",round(a$p.value,2))
+          }
+        else {
+              a=t.test(x~y)
+              paste("El valor de t para dos muestras independientes es:",round(a$statistic,2),"\n. El p-valor es: ",round(a$p.value,5))
+        }
+      }
+    })
+    
   
   #verDataFrame
   output$dataframe <- renderDataTable({

@@ -119,6 +119,14 @@ shinyUI(fluidPage(theme="cuanti.css",
                        radioButtons("margin",
                                     "Porcentajes:",
                                     c("por filas","por columnas"))
+      ),      
+      conditionalPanel("output.anali == 'boxplot'",
+                               checkboxInput("student",
+                                             "Prueba T de Student para las medias."),
+                               conditionalPanel(condition="input.student",
+                                                checkboxInput("pairedStudent","Muestras pareadas"),
+                                                tags$p(textOutput("studentText"))
+                               )
       )
     ), 
     # Show a plot of the generated distribution
