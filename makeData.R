@@ -185,10 +185,11 @@ wealth3 = wealth2 %>%
   select("PS","Household_Income","Population_Inequality_Gini_Index","Social_Circle_Inequality_Gini_Index","f_s","redist","income3tile","political3tile")
 colnames(wealth3)
 
-colnames(wealth3) = c("Sujeto","Ingreso.hogar","Gini_estimado_poblacion","Gini_estimado_circ.social","Igualdad_y_satisfaccion","Redistribucion","Tercil_ingreso_hogar","Orientacion_politica")
+colnames(wealth3) = c("Sujeto","Ingreso.hogar","Gini_estimado_poblacion","Gini_estimado_circ.social",
+                      "Igualdad_y_satisfaccion","Redistribucion","Tercil_ingreso_hogar","Orientacion_politica")
 
 wealth3$Tercil_ingreso_hogar = factor(wealth3$Tercil_ingreso_hogar,labels=c("Menor","Medio","Mayor"))
-wealth3$Tercil_orientacion_politica = factor(wealth3$Tercil_orientacion_politica,labels=c("Liberal-Izq","Centro","Conservador-Der"))
+wealth3$Orientacion_politica = factor(wealth3$Orientacion_politica,labels=c("Liberal-Izq","Centro","Conservador-Der"))
 
 attributes(wealth3$Sujeto)$label="Número de participante"
 attributes(wealth3$Ingreso.hogar)$label="Ingreso al hogar"
