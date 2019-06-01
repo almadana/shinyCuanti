@@ -45,6 +45,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                                      "Tabla de frecuencias bivariada"="tablaF2",
                                      "Gráfico de barras"="gbar",
                                      "Diagrama de caja"="boxplot",
+                                     "Intervalos de confianza para la media"="intconf",
                                      "Gráfico de dispersión"="dispersion")),
                        checkboxInput("muestrear",
                                      label="Tomar muestra aleatoria"
@@ -54,7 +55,8 @@ shinyUI(fluidPage(theme="cuanti.css",
                                      "Tamaño de la muestra",
                                      min=1,
                                      max=100,
-                                     value=10)
+                                     value=10),
+                        actionButton("remuestrear","Remuestrear")
                        )
         )),
     column(6,wellPanel("Variables",
@@ -138,7 +140,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                        htmlOutput("laTabla")),
       
       
-      conditionalPanel("output.anali == 'histograma' || output.anali == 'gbar' || output.anali == 'boxplot' || output.anali == 'dispersion'",
+      conditionalPanel("output.anali == 'histograma' || output.anali == 'gbar' || output.anali == 'boxplot' || output.anali == 'intconf'|| output.anali == 'dispersion'",
                        plotOutput("elPlot")
 #                       textOutput("mensaje")
       )

@@ -38,7 +38,7 @@ shinyServer(function(input, output,session) {
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
   listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3)
-  
+  muestra <- NULL
     dataSet <- eventReactive(input$selectorDatos,{
       
         laData = input$selectorDatos
@@ -51,8 +51,10 @@ shinyServer(function(input, output,session) {
     #--- cargar data() ----
         data <- eventReactive(input$goButton,{
       x=dataSet()
+      print("Che!")
+      print(muestra())
+      print(is.null(muestra))
       if (!is.null(muestra())) {
-        print(muestra())
         x = x[muestra(),]
       }
       if (!is.null(input$var1)) {
@@ -99,21 +101,37 @@ shinyServer(function(input, output,session) {
     
     
     #--- Actualizar valor de muestreo: ------
-    muestra <- eventReactive(input$sliderMuestra,{
+    muestra <- eventReactive(c(input$muestrear,input$sliderMuestra,input$remuestrear),{
+      remuestrear()
+    })
+    # 
+    # muestra <- eventReactive(input$remuestrear,{
+    #   remuestrear()
+    # },ignoreInit = T)
+    # # 
+    # muestra <- eventReactive(input$muestrear,{
+    #   if (input$muestrear) {
+    #     remuestrear()
+    #   }
+    #   else {
+    #     NULL
+    #   }
+    # })
+    # 
+    remuestrear <- function() {
       N = nrow(dataSet())
       if (input$muestrear) {
         updateCheckboxInput(session,"muestrear",label=paste0("Muestrear aleatoriamente un ",input$sliderMuestra,"% de los casos"))
         #actualizar dataSet
-        print(input$sliderMuestra)
         nCasos = round(input$sliderMuestra/100*N)
-        print(nCasos)
         sample(N,nCasos)
       }
       else {
         updateCheckboxInput(session,"muestrear",label="Tomar muestra aleatoria")
         1:N
       }
-    }) 
+    }
+    
     
     output$condition <- eventReactive(input$muestrear,
       input$muestrear
@@ -142,9 +160,9 @@ shinyServer(function(input, output,session) {
       nums=struct()[[3]] #variables numericas
       todas=!logical(length(nums))
       elegibles1=switch(input$analisis,"ver"=NULL,"descriptivo"=NULL,"histograma"=nums,
-                        "tablaF1"=!nums,"tablaF2"=!nums,"gbar"=!nums,"boxplot"=nums,"dispersion"=nums)    
+                        "tablaF1"=!nums,"tablaF2"=!nums,"gbar"=!nums,"boxplot"=nums,"intconf"=nums,"dispersion"=nums)    
       elegibles2=switch(input$analisis,"ver"=NULL,"descriptivo"=NULL,"histograma"=NULL,
-                        "tablaF1"=NULL,"tablaF2"=!nums,"gbar"=!nums,"boxplot"=todas,"dispersion"=nums)    
+                        "tablaF1"=NULL,"tablaF2"=!nums,"gbar"=!nums,"boxplot"=todas,"intconf"=todas,"dispersion"=nums)    
       
       updateSelectInput(session, "var1", choices = varsCDs[elegibles1])
       updateSelectInput(session, "var2", choices = c(varsCDs[elegibles2] ))
@@ -208,6 +226,7 @@ shinyServer(function(input, output,session) {
              "histograma"=hacerHistograma,
              "boxplot"=hacerBoxplot,
              "gbar"=hacerGrafBarras,
+             "intconf"=hacerIntervalo,
              "dispersion"=hacerDispersion,
              noPlot) 
     }) 
@@ -432,7 +451,60 @@ shinyServer(function(input, output,session) {
         }
       }
     })
+  
+    hacerIntervalo= function() {
+      x=data()[[1]]
+      y=data()[[2]]
+      multiplicador=1
+      if (input$var2==input$var1) {
+        nombre=data()[[3]]
+        mx=mean(x,na.rm=T)
+        sdx = sd(x,na.rm = T)
+        sex = sdx/sqrt(length(x))
+        plot(mx,main=paste("Intervalo de confianza de 95% para la media de",nombre),ylim = c(mx-2*multiplicador*sex,mx+2*multiplicador*sex))
+        segments(x0=1,y0=(mx-multiplicador*sex),x1=1,y1=(mx+multiplicador*sex),col="red")
+      }
+      else {
+        nums=struct()[[3]]
+        datos=data()[[6]]
+        nombre1=data()[[3]]
+        nombre2=data()[[4]]
+        if (nums[nombre2]) {
+          #print(nombre2)
+          mx=mean(x,na.rm = T)
+          my=mean(y,na.rm = T)
+          sdx = sd(x,na.rm = T)
+          sex = sdx/sqrt(length(x))
+          sdy = sd(y,na.rm = T)
+          sey = sdy/sqrt(length(y))
+          lowery = min(mx-2*multiplicador*sex,my-2*multiplicador*sey)
+          uppery = max(mx+2*multiplicador*sex,my+2*multiplicador*sey)
+          plot(c(mx,my),main="Intervalos de confianza de 95% para la media",ylim=c(lowery,uppery),xlim=c(.5,2.5),xaxt="n")
+          segments(x0=1,y0=(mx-multiplicador*sex),x1=1,y1=(mx+multiplicador*sex),col="red")
+          segments(x0=2,y0=(my-multiplicador*sey),x1=2,y1=(my+multiplicador*sey),col="red")
+          axis(side=1,at=c(1,2),labels=c(nombre1,nombre2))
+        }
+        else {
+          #print(nombre2)
+          mxy = tapply(x,y,function(x) mean(x,na.rm=T))
+          sexy = tapply(x,y,function(x) sd(x,na.rm = T)/sqrt(length(x)))
+          ycoords0 = mxy - multiplicador*sexy
+          ycoords1 = mxy + multiplicador*sexy
+          lowery = min(mxy-2*multiplicador*sexy)
+          uppery = max(mxy+2*multiplicador*sexy)
+          ycoords0
+          ycoords1
+          xcoords=1:length(unique(y))
+          plot(mxy,main="Intervalos de confianza de 95% para la media",xlab=nombre2,ylab=nombre1,ylim=c(lowery,uppery),xlim=c(.5,2.5),xaxt="n")
+          for (i in xcoords) {
+            segments(xcoords[i],ycoords0[i],xcoords[i],ycoords1[i],col="red",lwd=2)
+          }
+          axis(side=1,at=c(1,2),labels=unique(y))
+        }
+      }
+    }
     
+      
   
   #verDataFrame
   output$dataframe <- renderDataTable({
