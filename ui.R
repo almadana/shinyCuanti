@@ -127,7 +127,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                                              "Prueba T de Student para las medias."),
                                conditionalPanel(condition="input.student",
                                                 checkboxInput("pairedStudent","Muestras pareadas"),
-                                                tags$p(textOutput("studentText"))
+                                                tags$p(verbatimTextOutput("studentText"))
                                )
       )
     ), 

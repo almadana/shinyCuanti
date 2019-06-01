@@ -51,9 +51,6 @@ shinyServer(function(input, output,session) {
     #--- cargar data() ----
         data <- eventReactive(input$goButton,{
       x=dataSet()
-      print("Che!")
-      print(muestra())
-      print(is.null(muestra))
       if (!is.null(muestra())) {
         x = x[muestra(),]
       }
@@ -286,7 +283,7 @@ shinyServer(function(input, output,session) {
     x = data()[[1]]
     y = data()[[2]]
     a=chisq.test(x,y)
-    paste("El valor de Chi cuadrado es: ",round(a$statistic,2),"con",a$parameter,"grados de libertad.\n El p-valor es",round(a$p.value,2))
+    paste("El valor de Chi cuadrado es: ",round(a$statistic,2),"con",a$parameter,"grados de libertad.\n El p-valor es",catch_pvalues(a$p.value))
   })
 
   
@@ -359,7 +356,7 @@ shinyServer(function(input, output,session) {
     output$pCorrel1 <- renderText({
       x = data()[[1]]
       y = data()[[2]]
-      paste("El p-valor de la prueba de hipótesis (nula r=0) es:",round(cor.test(x,y)$p.value,4))
+      paste("El p-valor de la prueba de hipótesis (nula r=0) es:",catch_pvalues(cor.test(x,y)$p.value))
     })
     
     
@@ -436,21 +433,43 @@ shinyServer(function(input, output,session) {
       y=data()[[2]]
       if (input$var2==input$var1) {
         a=t.test(x)
-        paste("El valor de t para una muestra es: ",round(a$statistic,2),"\n. El p-valor es: ",round(a$p.value,5))
+        paste("El valor de t para una muestra es: ",round(a$statistic,2),"\n. El p-valor es: ",catch_pvalues(a$p.value))
       }
       else{
         nums=struct()[[3]]
         nombre2=data()[[4]]
           if (nums[nombre2]) {
               a=t.test(x,y,paired = input$pairedStudent)
-              paste("El valor de t para dos muestras",ifelse(input$pairedStudent,"pareadas","independientes"), "es: ",round(a$statistic,5),"\n. El p-valor es: ",round(a$p.value,2))
+              paste("El valor de t para dos muestras",ifelse(input$pairedStudent,"pareadas","independientes"), "es: ",round(a$statistic,5),"\n. El p-valor es: ",catch_pvalues(a$p.value))
           }
         else {
-              a=t.test(x~y)
-              paste("El valor de t para dos muestras independientes es:",round(a$statistic,2),"\n. El p-valor es: ",round(a$p.value,5))
+          etiquetas=levels(as.factor(y))
+          niveles=length(etiquetas)
+          a=pairwise.t.test(x,y)$p.value
+          texto = "Los p-valores de los contraste de medias son: \n"
+          for (i in 1:(niveles-1)) {
+            for (j in (i):(niveles-1)) {
+              texto = paste(texto,etiquetas[i]," --",etiquetas[j+1],":",catch_pvalues(a[j,i]),"\n")
+            }  
+          }
+          print("\n")
+          print(a)
+          print("---")
+          print(etiquetas)
+          texto
         }
       }
     })
+    
+    catch_pvalues<-function(x){
+      rp=round(x,5)
+      if (rp==0) {
+        return("<0.00001")
+      }
+      else{
+        return(rp)
+      }
+    }
   
     hacerIntervalo= function() {
       x=data()[[1]]
