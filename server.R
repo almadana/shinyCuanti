@@ -519,7 +519,7 @@ shinyServer(function(input, output,session) {
           for (i in xcoords) {
             segments(i,ycoords0[i],i,ycoords1[i],col="red",lwd=2)
           }
-          axis(side=1,at=xcoords,labels=unique(y))
+          axis(side=1,at=xcoords,labels=levels(factor(y)))
         }
       }
     }
