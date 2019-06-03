@@ -474,7 +474,7 @@ shinyServer(function(input, output,session) {
     hacerIntervalo= function() {
       x=data()[[1]]
       y=data()[[2]]
-      multiplicador=1
+      multiplicador=1.96
       if (input$var2==input$var1) {
         nombre=data()[[3]]
         mx=mean(x,na.rm=T)
@@ -513,12 +513,13 @@ shinyServer(function(input, output,session) {
           uppery = max(mxy+2*multiplicador*sexy)
           ycoords0
           ycoords1
-          xcoords=1:length(unique(y))
-          plot(mxy,main="Intervalos de confianza de 95% para la media",xlab=nombre2,ylab=nombre1,ylim=c(lowery,uppery),xlim=c(.5,2.5),xaxt="n")
+          niveles=length(unique(y))
+          xcoords=1:niveles
+          plot(mxy,main="Intervalos de confianza de 95% para la media",xlab=nombre2,ylab=nombre1,ylim=c(lowery,uppery),xlim=c(.5,niveles+.5),xaxt="n")
           for (i in xcoords) {
-            segments(xcoords[i],ycoords0[i],xcoords[i],ycoords1[i],col="red",lwd=2)
+            segments(i,ycoords0[i],i,ycoords1[i],col="red",lwd=2)
           }
-          axis(side=1,at=c(1,2),labels=unique(y))
+          axis(side=1,at=xcoords,labels=unique(y))
         }
       }
     }
