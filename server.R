@@ -550,6 +550,83 @@ shinyServer(function(input, output,session) {
     funcionDePloteo()()
   })
   
+  
+#--- Funciones de ploteo de distribuciones----  
+  output$distriPlot <- renderPlot({
+    funcionDePloteoDistri()()
+  })
+  
+  funcionDePloteoDistri <- reactive({
+    switch(input$selectorDist,
+           "binomial"=hacerBinomial,
+           "normal"=hacerNormal,
+           "student"=hacerStudent,
+           "chisq"=hacerChisq,
+           noPlot)    
+  })
+
+  # en la Binomial, ajusta el máximo número posible de eventos positivos al número de intentos  
+  observeEvent(input$nBin, {
+    updateSliderInput(session,"kBin",max=input$nBin)
+  })
+  
+  
+  hacerBinomial <- function() {
+    p=input$pBin
+    n=input$nBin
+    x=0:n
+    valores = dbinom(x,size=n,prob = p)
+    barplot(valores,names.arg = x,ylim = c(0,1.3*max(valores)))
+    if (input$pvalorBin) {
+      alphaValues = valores
+      par(new=T)
+      k=input$kBin
+      k_1 = n-k
+      big_k = max(k,k_1)
+      if (input$colas=="Una cola") {
+        if (big_k==k) {
+          index_k = x >=k
+        }
+        else {
+          index_k = x<=k
+        }
+        alphaValues[! (index_k) ] = 0
+      }
+      else {
+        small_k = n-big_k
+        index_big_k = x >= big_k
+        index_small_k = x <= small_k
+        alphaValues[ ! (index_big_k | index_small_k) ] = 0 
+      }
+      barplot(alphaValues,col = "red",ylim = c(0,1.3*max(valores)))
+      mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
+
+    }
+  }
+  
+  #--- Funciones de tabulado de distribuciones----
+  output$distriTable <- renderUI({
+    HTML(funcionDeTablaDistri()())
+  })
+  
+  funcionDeTablaDistri <- reactive({
+    switch(input$selectorDist,
+           "binomial"=tablaBinomial,
+           "normal"=tablaNormal,
+           "student"=tablaStudent,
+           "chisq"=tablaChisq,
+           noPlot)    
+  })
+  
+  tablaBinomial <- function() {
+    p=input$pBin
+    n=input$nBin
+    k=0:n
+    probabilidades = round(dbinom(k,size=n,prob = p),4)
+    htmlTable(cbind(k,probabilidades))
+  }
+  
+  
   # output$mensaje <- renderText({
   #   paste("Que pasa: !",input$analisis)
   # })
