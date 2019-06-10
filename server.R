@@ -659,7 +659,42 @@ shinyServer(function(input, output,session) {
     }
   }
   
-  
+  hacerNormal <- function() {
+    x=seq(-5,5,length=1000)
+    valores = dnorm(x)
+    plot(x,valores,lwd=2,type = "l",ylim = c(0,0.4))
+    if (input$pvalor) {
+      alphaValues = valores/sum(valores)
+      par(new=T)
+      z=input$zNormal
+      if (z>0) {
+        z_1 = -z
+        big_z = z
+      }
+      else {
+        z_1 = z
+        big_z = -z
+      }
+      if (input$colas=="Una cola") {
+        if (big_z==z) {
+          index_z = x >=z
+        }
+        else {
+          index_z = x<=z
+        }
+        alphaValues[!(index_z)]=0
+        polygon(c(x[index_z],z),c(valores[index_z],0),col="red")
+      }
+      else {
+        index_low_z = x<=z_1
+        index_high_z = x>=big_z
+        alphaValues[! (index_low_z | index_high_z)] = 0
+        polygon(c(x[index_high_z],x[which(index_high_z)[1]]),c(valores[index_high_z],0),col="red")
+        polygon(c(x[index_low_z],x[tail(which(index_low_z),1)]),c(valores[index_low_z],0),col="red")
+      }
+      mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
+    }
+  }
     
   #--- Funciones de tabulado de distribuciones----
   output$distriTable <- renderUI({
@@ -689,6 +724,9 @@ shinyServer(function(input, output,session) {
   
   tablaChisq <- function() {
     
+  } 
+  
+  tablaNormal <- function() {
   } 
   
   # output$mensaje <- renderText({

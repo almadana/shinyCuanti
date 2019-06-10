@@ -196,6 +196,9 @@ shinyUI(fluidPage(theme="cuanti.css",
                                 ),
                                 conditionalPanel(condition='input.selectorDist == "chisq"', 
                                                  sliderInput("chisq","Valor del estadístico chi cuadrado",min=0.1,max=50,value=0.1,step=.01)
+                                ),
+                                conditionalPanel(condition='input.selectorDist == "normal"', 
+                                                 sliderInput("zNormal","Valor del estadístico z",min=-5,max=5,value=0,step=.01)
                                 )
                )
              ),
