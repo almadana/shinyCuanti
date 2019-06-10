@@ -13,7 +13,7 @@ library(shiny)
 shinyUI(fluidPage(theme="cuanti.css",
 
   # Application title
-  tags$h1("Panel de análsis de datos de CUANTI"),
+  tags$h1("Panel de análisis de datos de CUANTI"),
   tabsetPanel(
     tabPanel("Análisis",
       fluidRow(
@@ -176,12 +176,22 @@ shinyUI(fluidPage(theme="cuanti.css",
              sidebarPanel(
                conditionalPanel(condition='input.selectorDist == "binomial"',
                   sliderInput("pBin","Elija un valor de p",min=0.01,max=0.99,value=0.5,step = 0.01,round=FALSE),
-                  sliderInput("nBin","Elija el número de intentos",min=2,max=100,value=10,step=1),
-                  checkboxInput("pvalorBin","Calcular p-valor"),
-                  conditionalPanel(condition='input.pvalorBin',
-                      radioButtons("colas","",choices = c("Una cola","Dos colas")),
-                      sliderInput("kBin","Número de intentos positivos",min=0,max=10,value=5,step=1)
-                  )
+                  sliderInput("nBin","Elija el número de intentos",min=2,max=100,value=10,step=1)
+                  
+               ),
+               conditionalPanel(condition='input.selectorDist == "student"',
+                                sliderInput("glStudent","Elija los grados de libertad",min=2,max=100,value=10,step = 1,round=T)
+                                
+               ),
+               checkboxInput("pvalor","Calcular p-valor"),
+               conditionalPanel(condition='input.pvalor',
+                                radioButtons("colas","",choices = c("Una cola","Dos colas")),
+                                conditionalPanel(condition='input.selectorDist == "binomial"', 
+                                  sliderInput("kBin","Número de intentos positivos",min=0,max=10,value=5,step=1)
+                                ),
+                                conditionalPanel(condition='input.selectorDist == "student"', 
+                                                 sliderInput("tStudent","Valor del estadístico t",min=-5,max=5,value=0,step=.01)
+                                )
                )
              ),
              mainPanel(

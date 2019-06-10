@@ -577,7 +577,7 @@ shinyServer(function(input, output,session) {
     x=0:n
     valores = dbinom(x,size=n,prob = p)
     barplot(valores,names.arg = x,ylim = c(0,1.3*max(valores)))
-    if (input$pvalorBin) {
+    if (input$pvalor) {
       alphaValues = valores
       par(new=T)
       k=input$kBin
@@ -603,7 +603,49 @@ shinyServer(function(input, output,session) {
 
     }
   }
+
+  hacerStudent <- function() {
+    gl=input$glStudent
+    x=seq(-5,5,length=1000)
+    valores = dt(x,gl)
+    plot(x,valores,lwd=2,type = "l",ylim = c(0,0.4))
+    if (input$pvalor) {
+      alphaValues = valores/sum(valores)
+      par(new=T)
+      t=input$tStudent
+      if (t>0) {
+        t_1 = -t
+        big_t = t
+      }
+      else {
+        t_1 = t
+        big_t = -t
+      }
+      if (input$colas=="Una cola") {
+        if (big_t==t) {
+          index_t = x >=t
+        }
+        else {
+          index_t = x<=t
+        }
+        alphaValues[!(index_t)]=0
+        polygon(c(x[index_t],t),c(valores[index_t],0),col="red")
+      }
+      else {
+        index_low_t = x<=t_1
+        index_high_t = x>=big_t
+        alphaValues[! (index_low_t | index_high_t)] = 0
+        polygon(c(x[index_high_t],x[which(index_high_t)[1]]),c(valores[index_high_t],0),col="red")
+        polygon(c(x[index_low_t],x[tail(which(index_low_t),1)]),c(valores[index_low_t],0),col="red")
+      }
+      mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
+      
+    }
+  }
   
+  
+  
+    
   #--- Funciones de tabulado de distribuciones----
   output$distriTable <- renderUI({
     HTML(funcionDeTablaDistri()())
@@ -626,6 +668,9 @@ shinyServer(function(input, output,session) {
     htmlTable(cbind(k,probabilidades))
   }
   
+  tablaStudent <- function() {
+    
+  }
   
   # output$mensaje <- renderText({
   #   paste("Que pasa: !",input$analisis)
