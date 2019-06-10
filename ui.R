@@ -179,18 +179,23 @@ shinyUI(fluidPage(theme="cuanti.css",
                   sliderInput("nBin","Elija el número de intentos",min=2,max=100,value=10,step=1)
                   
                ),
-               conditionalPanel(condition='input.selectorDist == "student"',
-                                sliderInput("glStudent","Elija los grados de libertad",min=2,max=100,value=10,step = 1,round=T)
+               conditionalPanel(condition='input.selectorDist == "student" || input.selectorDist == "chisq"',
+                                sliderInput("gLibertad","Elija los grados de libertad",min=2,max=100,value=10,step = 1,round=T)
                                 
                ),
                checkboxInput("pvalor","Calcular p-valor"),
                conditionalPanel(condition='input.pvalor',
-                                radioButtons("colas","",choices = c("Una cola","Dos colas")),
+                                conditionalPanel(condition='input.selectorDist != "chisq"',
+                                  radioButtons("colas","",choices = c("Una cola","Dos colas"))
+                                ),
                                 conditionalPanel(condition='input.selectorDist == "binomial"', 
                                   sliderInput("kBin","Número de intentos positivos",min=0,max=10,value=5,step=1)
                                 ),
                                 conditionalPanel(condition='input.selectorDist == "student"', 
                                                  sliderInput("tStudent","Valor del estadístico t",min=-5,max=5,value=0,step=.01)
+                                ),
+                                conditionalPanel(condition='input.selectorDist == "chisq"', 
+                                                 sliderInput("chisq","Valor del estadístico chi cuadrado",min=0.1,max=50,value=0.1,step=.01)
                                 )
                )
              ),

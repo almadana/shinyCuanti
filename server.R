@@ -605,7 +605,7 @@ shinyServer(function(input, output,session) {
   }
 
   hacerStudent <- function() {
-    gl=input$glStudent
+    gl=input$gLibertad
     x=seq(-5,5,length=1000)
     valores = dt(x,gl)
     plot(x,valores,lwd=2,type = "l",ylim = c(0,0.4))
@@ -643,6 +643,21 @@ shinyServer(function(input, output,session) {
     }
   }
   
+  hacerChisq <- function() {
+    gl=input$gLibertad
+    x=seq(0,30+gl,length=1000)
+    valores = dchisq(x,gl)
+    plot(x,valores,lwd=2,type = "l",ylim = c(0,0.2))
+    if (input$pvalor) {
+      alphaValues = valores/sum(valores)
+      par(new=T)
+      chisq=input$chisq
+      index_chisq = x >=chisq
+      alphaValues[!(index_chisq)]=0
+      polygon(c(x[index_chisq],chisq),c(valores[index_chisq],0),col="red")
+      mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
+    }
+  }
   
   
     
@@ -671,6 +686,10 @@ shinyServer(function(input, output,session) {
   tablaStudent <- function() {
     
   }
+  
+  tablaChisq <- function() {
+    
+  } 
   
   # output$mensaje <- renderText({
   #   paste("Que pasa: !",input$analisis)
