@@ -350,7 +350,7 @@ shinyServer(function(input, output,session) {
     output$coefCorrel1 <- renderText({
       x = data()[[1]]
       y = data()[[2]]
-      paste("El coeficiente de correlación de Pearson es:",round(cor(x,y),2))
+      paste("El coeficiente de correlación de Pearson es:",round(cor(x,y,use = "pairwise.complete.obs"),2))
     })
         
     output$pCorrel1 <- renderText({
