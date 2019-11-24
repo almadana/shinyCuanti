@@ -292,7 +292,7 @@ shinyServer(function(input, output,session) {
     numericas=struct()[[3]]
     medias=apply(datos[,numericas],2,mean,na.rm=T)
     desv=apply(datos[,numericas],2,sd,na.rm=T)
-    qtiles= round(t(apply(datos[,numericas],2,quantile)),2)
+    qtiles= round(t(apply(datos[,numericas],2,quantile,na.rm=T)),2)
     moda=apply(datos,2,getmode)
     sumario=data.frame(Variables=colnames(datos))
     sumario[numericas,"Media"] = round(medias,2)
