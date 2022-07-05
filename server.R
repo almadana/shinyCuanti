@@ -21,6 +21,7 @@ load("./data/miniBase.RData")
 load("./data/expeCuna.RData")
 load("./data/inteligencia.RData")
 load("./data/wealth.RData")
+load("./data/endis.RData")
 
 
 #GA logger settings
@@ -37,7 +38,7 @@ shinyServer(function(input, output,session) {
   ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
-  listaDeDatos = list("censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3)
+  listaDeDatos = list("endis"=endis,"censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3)
   muestra <- NULL
     dataSet <- eventReactive(input$selectorDatos,{
       

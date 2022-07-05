@@ -104,7 +104,7 @@ table(encuesta1$RangoEdad,encuesta1$Trabaja)
 save(encuesta1,file="./data/encuesta.RData")
 
 
-### Latinobarómetro
+###--- Latinobarómetro----
 library(haven)
 #latino=read.spss("../data/latinobarometro/Latinobarometro2017Abrev.sav",to.data.frame = T)
 latino=read_sav("../data/latinobarometro/Latinobarometro2017Abrev.sav")
