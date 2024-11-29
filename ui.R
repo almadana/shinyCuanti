@@ -28,7 +28,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                                      selected = "")
                          )
                ),
-        column(4, #panel de RESUMEN - Nombre de variables, tipo, y niveles (min-max)
+        column(8, #panel de RESUMEN - Nombre de variables, tipo, y niveles (min-max)
                wellPanel("Resumen",
                          conditionalPanel(
                            condition = "output.dataSelected",
@@ -61,7 +61,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                             actionButton("remuestrear","Remuestrear")
                            )
             )),
-        column(6,wellPanel("Variables",
+        column(8,wellPanel("Variables",
                           conditionalPanel(
                             condition = "output.dataSelected",
                             # placeholders will be replaced from the server
