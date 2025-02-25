@@ -7,11 +7,18 @@
 #    http://shiny.rstudio.com/
 #
 
+
+# colours
+
+col1 = "#b4a5fa"
+col2 = "#c8fab4"
+col1f = "#6446fa"
+col2f = "#9bfa82"
+
 library(shiny)
 library(ggplot2)
 library(htmlTable)
 library(dplyr)
-library(GAlogger)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
 load("./data/serce.RData")
@@ -23,10 +30,12 @@ load("./data/inteligencia.RData")
 load("./data/wealth.RData")
 load("./data/endis.RData")
 
+source("./cuanti_theme.r")
+
 
 #GA logger settings
-ga_set_tracking_id("UA-136860877-2")
-ga_set_approval(consent = TRUE)
+# ga_set_tracking_id("UA-136860877-2")
+# ga_set_approval(consent = TRUE)
 
 
 
@@ -35,7 +44,7 @@ currentDataset = censoFil
 
 
 shinyServer(function(input, output,session) {
-  ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
+  #ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
   listaDeDatos = list("endis"=endis,"censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3)
@@ -74,7 +83,9 @@ shinyServer(function(input, output,session) {
       }
       anali=input$analisis
 #      print(anali)
+      ##########################################################
       # 1- var1, 2-var2, 3-var1name, 4-var2name, 5-anali, 6-data
+      #########################################################
       list(v1,v2,v1name,v2name,anali,x)
     }
     )
@@ -82,7 +93,7 @@ shinyServer(function(input, output,session) {
 
     #--- cargar output.anali ----
     output$anali <- eventReactive(input$goButton,{
-      ga_collect_event(event_category = "Analizar",event_label = "Botón de análisis")
+      #ga_collect_event(event_category = "Analizar",event_label = "Botón de análisis")
       input$analisis
     })
     outputOptions(output, "anali", suspendWhenHidden = FALSE)
@@ -314,8 +325,10 @@ shinyServer(function(input, output,session) {
   #funciones de gráficas
     hacerHistograma = function() {
       #print(data())
-      d = data()[[1]]
-      nombre = data()[[3]]
+      d = data()[[1]] # variable elegida (datos)
+      df = data()[[6]] # el data frame posta
+      nombre = data()[[3]] # nombre de variable para hacer el histograma
+      n_bins = input$bins
       # generate bins based on input$bins from ui.R
       bins <- seq(min(d,na.rm=T), max(d,na.rm=T), length.out = input$bins + 1)
       
@@ -323,13 +336,24 @@ shinyServer(function(input, output,session) {
       titulo = paste("Histograma de",input$var1)
       #print(d)
       #print(is.numeric(d))
+      print(df[nombre])
+      p_h = ggplot(df,aes(x=.data[[nombre]])) + geom_histogram(aes(y = ..density..), bins = n_bins,fill=col1f,col=col2f) + labs(x = nombre,
+                                                                            y = "frecuencia",
+                                                                            title = titulo) + 
+        theme_cuanti()
+      
       if (input$ajusteNormal) {
-        hist(d, breaks = bins, col = 'darkgray', border = 'white',xlab = nombre,ylab="Frecuencia",main="Histograma",prob=T)
-        curve(dnorm(x,mean(d),sd(d)),bins[1],bins[length(bins)],add=T)
+        media_d = mean(d, na.rm = TRUE)
+        sd_d = sd(d, na.rm = TRUE)
+        
+        # Crear datos para la curva normal
+        x_seq = seq(min(d, na.rm = TRUE), max(d, na.rm = TRUE), length.out = 100)
+        norm_data = tibble(x = x_seq, y = dnorm(x_seq, mean = media_d, sd = sd_d))
+        
+        # Agregar la curva normal
+        p_h = p_h + geom_line(data = norm_data, aes(x = x, y = y), color = col2f, size = 1)
       }
-      else {
-        hist(d, breaks = bins, col = 'darkgray', border = 'white',xlab = nombre,ylab="Frecuencia",main="Histograma",prob=F)
-      }
+      show(p_h)
     }
 
     hacerDispersion = function() {
@@ -528,7 +552,7 @@ shinyServer(function(input, output,session) {
       
   
   #verDataFrame
-  output$dataframe <- renderDataTable({
+  output$dataframe <- DT::renderDT({
     # print("Bingo!")
     #print(str(data()[[6]]))
     # print(data()[[6]])
