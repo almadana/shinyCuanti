@@ -136,7 +136,7 @@ shinyUI(fluidPage(theme="cuanti.css",
         # Show a plot of the generated distribution
         mainPanel(
           conditionalPanel(condition="output.anali == 'ver'",
-                           dataTableOutput("dataframe")),
+                           DT::DTOutput("dataframe")),
           
           conditionalPanel(condition="output.anali == 'tablaF1' || output.anali == 'tablaF2' || output.anali == 'descriptivo' ",
                            htmlOutput("laTabla")),

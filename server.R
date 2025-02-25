@@ -361,15 +361,21 @@ shinyServer(function(input, output,session) {
       y = data()[[2]]
       nombre.x = data()[[3]]
       nombre.y = data()[[4]]
+      df = data()[[6]] # el data frame posta
+
+      
       
       pointSize = input$pointSize
       
       # draw the histogram with the specified number of bins
       #titulo = paste("Histograma de",input$var1)
-      plot(x, y,cex = pointSize,xlab = nombre.x,ylab=nombre.y,main="")
+      #plot(x, y,cex = pointSize,xlab = nombre.x,ylab=nombre.y,main="")
+      p_d = ggplot(df,aes(x=.data[[nombre.x]],y=.data[[nombre.y]])) + geom_point(size=pointSize,col=col1f) + theme_cuanti()
       if (input$tendencia) {
-        abline(lm(y~x))
+        #abline(lm(y~x))
+        p_d = p_d + geom_smooth(method="lm",se=F,col=col2f,size=2)
       }
+      show(p_d)
     }
     
     output$coefCorrel1 <- renderText({
