@@ -11,13 +11,15 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme="cuanti.css",
+  shinyjs::useShinyjs(),
+                  
 
   # Application title
   tags$h1("Panel de análisis de datos de CUANTI"),
   tabsetPanel(
     tabPanel("Análisis",
       fluidRow(
-        column(4,
+        column(3,
                wellPanel("Datos",
                          selectInput("selectorDatos","Elegir base de datos",
                                      c("ENDIS"="endis","SERCE"="serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1",
@@ -28,17 +30,24 @@ shinyUI(fluidPage(theme="cuanti.css",
                                      selected = "")
                          )
                ),
-        column(8, #panel de RESUMEN - Nombre de variables, tipo, y niveles (min-max)
-               wellPanel("Resumen",
-                         conditionalPanel(
-                           condition = "output.dataSelected",
-                           tableOutput("summaryTable")
-                         )
+        column(9, #panel de RESUMEN - Nombre de variables, tipo, y niveles (min-max)
+               
+               wellPanel(
+                    #mainPanel(
+                      actionButton("toggleSidebar", "Mostrar resumen"),
+                        div(id="tabla_resumen",style = "display: none;",
+                          conditionalPanel(
+                             condition = "output.dataSelected",
+                            tableOutput("summaryTable")
+                          )
+                     #   )
+                    )
                )
+               
         )
       ),
       fluidRow(
-        column(4,wellPanel("Análisis",
+        column(3,wellPanel("Análisis",
                            selectInput("analisis","Elegir análisis",
                                        c("Ver datos"="ver",
                                          "Descriptivo"="descriptivo",
@@ -61,7 +70,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                             actionButton("remuestrear","Remuestrear")
                            )
             )),
-        column(8,wellPanel("Variables",
+        column(9,wellPanel("Variables",
                           conditionalPanel(
                             condition = "output.dataSelected",
                             # placeholders will be replaced from the server
@@ -152,10 +161,9 @@ shinyUI(fluidPage(theme="cuanti.css",
       ),
               div(class="barraPie",
                   
-                  span(class="spanner",img(src='logoCSE.png', align = "left",class="logo"),
+                  span(class="spanner",img(src='educacion-permanente.jpg', align = "left",class="logo"),
                        "Proyecto CSE 2018 Innovaciones educativas - Desarrollo: Á. Cabana - ",
-                        a(href='https:/github.com/almadana/shinyCuanti',"Repositorio Github"," - Licencia GPL v4."),
-                      img(src='logoFPsi.png', align = "right",class="logo")
+                        a(href='https:/github.com/almadana/shinyCuanti',"Repositorio Github"," - Licencia GPL v4.")
                   )
               )
         )

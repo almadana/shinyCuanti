@@ -49,6 +49,20 @@ shinyServer(function(input, output,session) {
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
   listaDeDatos = list("endis"=endis,"censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3)
   muestra <- NULL
+  
+  estado_visible <- reactiveVal(FALSE)
+  
+  observeEvent(input$toggleSidebar, {
+    nuevo_estado <- !estado_visible()
+    estado_visible(nuevo_estado)
+    
+    shinyjs::toggle(id = "tabla_resumen")
+    
+    texto <- if (nuevo_estado) "Ocultar resumen" else "Mostrar resumen"
+    shinyjs::html("toggleSidebar", texto)
+  })
+  
+  
     dataSet <- eventReactive(input$selectorDatos,{
       
         laData = input$selectorDatos
@@ -393,31 +407,75 @@ shinyServer(function(input, output,session) {
     
     
     hacerGrafBarras = function() {
-    if (input$var2==input$var1) {
-      nombre=data()[[3]]
-      tab=table(data()[[1]])
-      if (input$freq=="porcentuales") {
-        tab=prop.table(tab)
-        tab=tab*100
-      } 
-      barplot(tab,main=nombre)
-    }
-    else {
-      nombre1=data()[[3]]
-      nombre2=data()[[4]]
-      #print(nombre2)
-      tab=table(data()[[1]],data()[[2]])
-      if (input$freq=="porcentuales") {
-        tab=prop.table(tab,2)
-        tab=tab*100
-      } 
-      barplot(tab,beside = input$stacked!="apiladas",xlab = nombre2)
-      position=switch(input$leyenda,"izquierda"="topleft","derecha"="topright")
-      legend(position,levels(data()[[1]]),fill=gray.colors(length(levels(data()[[1]]))))
-      title(paste("Gráfico de",nombre1,"según",nombre2))
+      nombre.x = data()[[3]]
+      nombre.y = data()[[4]]
+      df = data()[[6]]
+    
       
+      
+      
+        
+      if (input$var2==input$var1) {
+        nombre=data()[[3]]
+        tab=table(data()[[1]])
+  
+        if (input$freq == "porcentuales") {
+          p_bar = ggplot(df, aes(x = .data[[nombre.x]])) +
+            geom_bar(aes(y = after_stat(prop))) +
+            scale_y_continuous(labels = scales::percent_format(scale = 100)) +
+            labs(y = "Porcentaje", title = "Barras porcentuales")
+        } else {
+          p_bar = ggplot(df, aes(x = .data[[nombre.x]])) +
+            geom_bar() +
+            labs(y = "Frecuencias absolutas", title = "Barras (frecuencias)")
+        }
+      }
+        
+      else {
+      
+        if (input$freq=="porcentuales") {
+          
+          if (input$stacked == "apiladas") { 
+            p_bar = ggplot(df, aes(x = .data[[nombre.x]], fill = .data[[nombre.y]])) +
+              geom_bar(position = "fill") +
+              scale_y_continuous(labels = scales::percent_format()) +
+              labs(y = "Porcentaje", title = "Barras apiladas porcentuales")
+          }
+          
+          else {
+            p_bar = df %>% 
+              group_by(.data[[nombre.x]],.data[[nombre.y]]) %>% 
+              summarise(n = n(), .groups = "drop") %>%
+              mutate(porcentaje = n / sum(n)) %>% 
+              ggplot(aes(x = .data[[nombre.x]], y=porcentaje,fill = .data[[nombre.y]])) +
+              geom_bar(stat = "identity", position = position_dodge()) +
+              scale_y_continuous(labels = scales::percent_format(scale = 100)) +
+              labs(y = "Porcentaje", title = "Barras lado a lado porcentuales")
+            
+          }
+        }
+        else {
+          if (input$stacked == "apiladas") { 
+
+            p_bar = ggplot(df, aes(x = .data[[nombre.x]], fill = .data[[nombre.y]])) +
+              geom_bar(position = "stack") +
+              labs(y = "Frecuencias absolutas", title = "Barras apiladas")
+          }
+          else {
+            p_bar = ggplot(df, aes(x = .data[[nombre.x]], fill = .data[[nombre.y]])) +
+              geom_bar(position = position_dodge()) +
+              labs(y = "Frecuencias absolutas", title = "Barras lado a lado")
+            
+          }
+        }
+        # 
+        # barplot(tab,beside = input$stacked!="apiladas",xlab = nombre2)
+        # legend(position,levels(data()[[1]]),fill=gray.colors(length(levels(data()[[1]]))))
+        # title(paste("Gráfico de",nombre1,"según",nombre2))
+        # 
       #qplot(dt,aes_string(x=a,fill=b))+geom_bar(stat="identity",position = position_dodge())
-    }
+      }
+      show(p_bar + theme_cuanti() + scale_fill_categorical() )
   }
     
     hacerBoxplot= function() {
@@ -689,6 +747,10 @@ shinyServer(function(input, output,session) {
       mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
     }
   }
+  
+  
+  
+  
   
   hacerNormal <- function() {
     x=seq(-5,5,length=1000)
