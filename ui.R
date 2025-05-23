@@ -11,6 +11,7 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme="cuanti.css",
+#shinyUI(fluidPage(
   shinyjs::useShinyjs(),
                   
 
@@ -146,6 +147,10 @@ shinyUI(fluidPage(theme="cuanti.css",
         mainPanel(
           conditionalPanel(condition="output.anali == 'ver'",
                            DT::DTOutput("dataframe")),
+                           #DT::DTOutput("dataframe", width = "100%", key = tablaKey())),
+                           #uiOutput("dataframe")),
+                           
+                           
           
           conditionalPanel(condition="output.anali == 'tablaF1' || output.anali == 'tablaF2' || output.anali == 'descriptivo' ",
                            htmlOutput("laTabla")),

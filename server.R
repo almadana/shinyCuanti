@@ -45,6 +45,8 @@ currentDataset = censoFil
 
 
 shinyServer(function(input, output,session) {
+  tablaKey <- reactiveVal(0)
+  
   #ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
@@ -70,9 +72,7 @@ shinyServer(function(input, output,session) {
         listaDeDatos[[laData]]
     
   })
-    
-    
-
+  
     #--- cargar data() ----
         data <- eventReactive(input$goButton,{
       x=dataSet()
@@ -104,6 +104,9 @@ shinyServer(function(input, output,session) {
       list(v1,v2,v1name,v2name,anali,x)
     }
     )
+    observeEvent(input$goButton, {
+      tablaKey(tablaKey() + 1)
+    })
     
 
     #--- cargar output.anali ----
@@ -217,7 +220,9 @@ shinyServer(function(input, output,session) {
       sumario = data.frame(Variable=names(a),Descripcion=etiquetas,Tipo.de.variable=a)
       #print(sumario)
       #print(numericas)
-      sumario[!numericas,"Valores"]=niveles
+      if (any(!numericas)) {
+        sumario[!numericas,"Valores"]=niveles 
+      }
       sumario[numericas,"Valores"]=minMax
       sumario
     },spacing="xs")
@@ -617,12 +622,21 @@ shinyServer(function(input, output,session) {
       
   
   #verDataFrame
-  output$dataframe <- DT::renderDT({
-     print("Bingo!")
+  output$dataframe <- DT::renderDataTable({
+    print(nrow(data()[[6]]))
     #print(str(data()[[6]]))
     # print(data()[[6]])
-    data()[[6]]
+    #data()[[6]]
+    DT::datatable(data()[[6]], rownames = FALSE, escape = FALSE, options = list(pageLength = 10))
+
   })
+  # 
+  # output$dataframe <- renderUI({
+  #   req(data()[[6]])
+  #   DT::renderDataTable({
+  #     DT::datatable(data()[[6]])
+  #   })
+  # })
   
   
   output$laTabla <- renderUI({

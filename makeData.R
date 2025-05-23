@@ -276,4 +276,5 @@ add_labels <- function(df, diccionario) {
 }
 wvs = add_labels(wvs, dic_wvs_es)
 wvs$pais = "UY"
+wvs$pais = as.factor(wvs$pais)
 save(wvs,file="./data/wvs.RData")
