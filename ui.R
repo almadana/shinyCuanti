@@ -84,7 +84,7 @@ shinyUI(fluidPage(theme="cuanti.css",
       ),
       fluidRow(
       sidebarLayout(
-        sidebarPanel(
+        sidebarPanel(width=3,
           # Sidebar with some panels
           conditionalPanel(condition="output.anali == 'histograma'",
             sliderInput("bins",
@@ -144,7 +144,7 @@ shinyUI(fluidPage(theme="cuanti.css",
           )
         ), 
         # Show a plot of the generated distribution
-        mainPanel(
+        mainPanel(width=9,
           conditionalPanel(condition="output.anali == 'ver'",
                            DT::DTOutput("dataframe")),
                            #DT::DTOutput("dataframe", width = "100%", key = tablaKey())),

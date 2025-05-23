@@ -1,4 +1,4 @@
-theme_cuanti <- function(base_size=14, base_family="Helvetica") {
+theme_cuanti <- function(base_size=16, base_family="Helvetica") {
   require(grid)
   require(ggthemes)
   (theme_foundation(base_size=base_size, base_family=base_family)

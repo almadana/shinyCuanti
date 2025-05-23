@@ -356,7 +356,7 @@ shinyServer(function(input, output,session) {
       titulo = paste("Histograma de",input$var1)
       #print(d)
       #print(is.numeric(d))
-      print(df[nombre])
+      #print(df[nombre])
       p_h = ggplot(df,aes(x=.data[[nombre]])) + geom_histogram(aes(y = ..density..), bins = n_bins,fill=col1f,col=col2f) + labs(x = nombre,
                                                                             y = "frecuencia",
                                                                             title = titulo) + 
@@ -427,12 +427,12 @@ shinyServer(function(input, output,session) {
   
         if (input$freq == "porcentuales") {
           p_bar = ggplot(df, aes(x = .data[[nombre.x]])) +
-            geom_bar(aes(y = after_stat(prop))) +
+            geom_bar(aes(y = after_stat(prop)),col=col2f,fill=col1f) +
             scale_y_continuous(labels = scales::percent_format(scale = 100)) +
             labs(y = "Porcentaje", title = "Barras porcentuales")
         } else {
           p_bar = ggplot(df, aes(x = .data[[nombre.x]])) +
-            geom_bar() +
+            geom_bar(col=col2f,fill=col1f) +
             labs(y = "Frecuencias absolutas", title = "Barras (frecuencias)")
         }
       }
@@ -482,46 +482,54 @@ shinyServer(function(input, output,session) {
       #qplot(dt,aes_string(x=a,fill=b))+geom_bar(stat="identity",position = position_dodge())
       }
       show(p_bar + theme_cuanti() + scale_fill_categorical() )
-  }
+    }
+    hacerBoxplot = function() {
+      x = data()[[1]]
+      y = data()[[2]]
+      df = data()[[6]]
+      nombre1 = data()[[3]]
+      nombre2 = data()[[4]]
+      nums = struct()[[3]]
+      
+      if (input$var2 == input$var1) {
+        # Univariado
+        mx = mean(x, na.rm = TRUE)
+        ggplot(df, aes(x = "", y = .data[[nombre1]])) +
+          geom_boxplot(fill = col1) +
+          geom_hline(yintercept = mx, color = col2f) +
+          labs(x = "", y = nombre1, title = paste("Diagrama de caja de", nombre1)) +
+          theme_cuanti()
+      } else {
+        if (nums[nombre2]) {
+          # Ambos numéricos: mostramos como dos boxplots lado a lado
+          df2 = tibble(variable = c(nombre1, nombre2),
+                       valor = c(x, y))
+          medias = df2 |>
+            group_by(variable) |>
+            summarise(media = mean(valor, na.rm = TRUE))
+          
+          ggplot(df2, aes(x = variable, y = valor)) +
+            geom_boxplot(fill = col1) +
+            geom_point(data = medias, aes(x = variable, y = media), 
+                       color = col2f, size = 3) +
+            labs(x = "Variable", y = "Valores", title = "Diagrama de caja") +
+            theme_cuanti()
+        } else {
+          # Y es categórica: boxplot clásico con medias por grupo
+          medias = df |>
+            group_by(.data[[nombre2]]) |>
+            summarise(media = mean(.data[[nombre1]], na.rm = TRUE))
+          
+          ggplot(df, aes(x = .data[[nombre2]], y = .data[[nombre1]])) +
+            geom_boxplot(fill = col1) +
+            geom_point(data = medias, aes(x = .data[[nombre2]], y = media), 
+                       color = col2f, size = 3) +
+            labs(x = nombre2, y = nombre1, title = "Diagrama de caja") +
+            theme_cuanti()
+        }
+      }
+    }
     
-    hacerBoxplot= function() {
-      x=data()[[1]]
-      y=data()[[2]]
-      meanOffset = .45
-    if (input$var2==input$var1) {
-      nombre=data()[[3]]
-      mx=mean(x,na.rm=T)
-      boxplot(x,main=paste("Diagrama de caja de",nombre))
-      segments(.6,mx,1.4,mx,col="red")
-      mtext("La línea roja indica la media",1)
-    }
-    else {
-      nums=struct()[[3]]
-      datos=data()[[6]]
-      nombre1=data()[[3]]
-      nombre2=data()[[4]]
-      if (nums[nombre2]) {
-        #print(nombre2)
-        boxplot(x,y,data=datos,main="Diagrama de caja",xlab="Variable",ylab="Valores",names=c(nombre1,nombre2))
-        mx=mean(x,na.rm = T)
-        my=mean(y,na.rm = T)
-        segments(1-meanOffset,mx,1+meanOffset,mx,col="red")
-        segments(2-meanOffset,my,2+meanOffset,my,col="red")
-        mtext("La líneas rojas indican la media",1)
-      }
-      else {
-        #print(nombre2)
-        mxy = tapply(x,y,function(x) mean(x,na.rm=T))
-        s=1:length(unique(y))
-        xcoords=s-meanOffset
-        xcoords1=s+meanOffset
-        boxplot(formula(paste(nombre1,nombre2,sep="~")),data=datos,main="Diagrama de caja",xlab=nombre2,ylab=nombre1)
-        segments(xcoords[s],mxy[s],xcoords1[s],mxy[s],col="red",lwd=2)
-        mtext("La líneas rojas indican la media",1)
-      }
-    }
-  }
-  
     output$studentText <- renderText({
      # Prueba T de Student para las medias.
       x=data()[[1]]
@@ -566,60 +574,118 @@ shinyServer(function(input, output,session) {
       }
     }
   
-    hacerIntervalo= function() {
-      x=data()[[1]]
-      y=data()[[2]]
-      multiplicador=1.96
-      if (input$var2==input$var1) {
-        nombre=data()[[3]]
-        mx=mean(x,na.rm=T)
-        sdx = sd(x,na.rm = T)
-        sex = sdx/sqrt(length(x))
-        plot(mx,main=paste("Intervalo de confianza de 95% para la media de",nombre),ylim = c(mx-2*multiplicador*sex,mx+2*multiplicador*sex))
-        segments(x0=1,y0=(mx-multiplicador*sex),x1=1,y1=(mx+multiplicador*sex),col="red")
-      }
-      else {
-        nums=struct()[[3]]
-        datos=data()[[6]]
-        nombre1=data()[[3]]
-        nombre2=data()[[4]]
-        if (nums[nombre2]) {
-          #print(nombre2)
-          mx=mean(x,na.rm = T)
-          my=mean(y,na.rm = T)
-          sdx = sd(x,na.rm = T)
-          sex = sdx/sqrt(length(x))
-          sdy = sd(y,na.rm = T)
-          sey = sdy/sqrt(length(y))
-          lowery = min(mx-2*multiplicador*sex,my-2*multiplicador*sey)
-          uppery = max(mx+2*multiplicador*sex,my+2*multiplicador*sey)
-          plot(c(mx,my),main="Intervalos de confianza de 95% para la media",ylim=c(lowery,uppery),xlim=c(.5,2.5),xaxt="n")
-          segments(x0=1,y0=(mx-multiplicador*sex),x1=1,y1=(mx+multiplicador*sex),col="red")
-          segments(x0=2,y0=(my-multiplicador*sey),x1=2,y1=(my+multiplicador*sey),col="red")
-          axis(side=1,at=c(1,2),labels=c(nombre1,nombre2))
-        }
-        else {
-          #print(nombre2)
-          mxy = tapply(x,y,function(x) mean(x,na.rm=T))
-          sexy = tapply(x,y,function(x) sd(x,na.rm = T)/sqrt(length(x)))
-          ycoords0 = mxy - multiplicador*sexy
-          ycoords1 = mxy + multiplicador*sexy
-          lowery = min(mxy-2*multiplicador*sexy)
-          uppery = max(mxy+2*multiplicador*sexy)
-          ycoords0
-          ycoords1
-          niveles=length(unique(y))
-          xcoords=1:niveles
-          plot(mxy,main="Intervalos de confianza de 95% para la media",xlab=nombre2,ylab=nombre1,ylim=c(lowery,uppery),xlim=c(.5,niveles+.5),xaxt="n")
-          for (i in xcoords) {
-            segments(i,ycoords0[i],i,ycoords1[i],col="red",lwd=2)
-          }
-          axis(side=1,at=xcoords,labels=levels(factor(y)))
-        }
+    # hacerIntervalo= function() {
+    #   x=data()[[1]]
+    #   y=data()[[2]]
+    #   multiplicador=1.96
+    #   if (input$var2==input$var1) {
+    #     nombre=data()[[3]]
+    #     mx=mean(x,na.rm=T)
+    #     sdx = sd(x,na.rm = T)
+    #     sex = sdx/sqrt(length(x))
+    #     plot(mx,main=paste("Intervalo de confianza de 95% para la media de",nombre),ylim = c(mx-2*multiplicador*sex,mx+2*multiplicador*sex))
+    #     segments(x0=1,y0=(mx-multiplicador*sex),x1=1,y1=(mx+multiplicador*sex),col="red")
+    #   }
+    #   else {
+    #     nums=struct()[[3]]
+    #     datos=data()[[6]]
+    #     nombre1=data()[[3]]
+    #     nombre2=data()[[4]]
+    #     if (nums[nombre2]) {
+    #       #print(nombre2)
+    #       mx=mean(x,na.rm = T)
+    #       my=mean(y,na.rm = T)
+    #       sdx = sd(x,na.rm = T)
+    #       sex = sdx/sqrt(length(x))
+    #       sdy = sd(y,na.rm = T)
+    #       sey = sdy/sqrt(length(y))
+    #       lowery = min(mx-2*multiplicador*sex,my-2*multiplicador*sey)
+    #       uppery = max(mx+2*multiplicador*sex,my+2*multiplicador*sey)
+    #       plot(c(mx,my),main="Intervalos de confianza de 95% para la media",ylim=c(lowery,uppery),xlim=c(.5,2.5),xaxt="n")
+    #       segments(x0=1,y0=(mx-multiplicador*sex),x1=1,y1=(mx+multiplicador*sex),col="red")
+    #       segments(x0=2,y0=(my-multiplicador*sey),x1=2,y1=(my+multiplicador*sey),col="red")
+    #       axis(side=1,at=c(1,2),labels=c(nombre1,nombre2))
+    #     }
+    #     else {
+    #       #print(nombre2)
+    #       mxy = tapply(x,y,function(x) mean(x,na.rm=T))
+    #       sexy = tapply(x,y,function(x) sd(x,na.rm = T)/sqrt(length(x)))
+    #       ycoords0 = mxy - multiplicador*sexy
+    #       ycoords1 = mxy + multiplicador*sexy
+    #       lowery = min(mxy-2*multiplicador*sexy)
+    #       uppery = max(mxy+2*multiplicador*sexy)
+    #       ycoords0
+    #       ycoords1
+    #       niveles=length(unique(y))
+    #       xcoords=1:niveles
+    #       plot(mxy,main="Intervalos de confianza de 95% para la media",xlab=nombre2,ylab=nombre1,ylim=c(lowery,uppery),xlim=c(.5,niveles+.5),xaxt="n")
+    #       for (i in xcoords) {
+    #         segments(i,ycoords0[i],i,ycoords1[i],col="red",lwd=2)
+    #       }
+    #       axis(side=1,at=xcoords,labels=levels(factor(y)))
+    #     }
+    #   }
+    # }
+    
+    hacerIntervalo = function() {
+      x = data()[[1]]
+      y = data()[[2]]
+      df = data()[[6]]
+      nombre1 = data()[[3]]
+      nombre2 = data()[[4]]
+      nums = struct()[[3]]
+      multiplicador = 1.96
+      
+      if (input$var2 == input$var1) {
+        mx = mean(x, na.rm = TRUE)
+        sex = sd(x, na.rm = TRUE) / sqrt(length(x))
+        df_ic = tibble(grupo = nombre1, media = mx, li = mx - multiplicador * sex, ls = mx + multiplicador * sex)
+        
+        ggplot(df_ic, aes(x = grupo, y = media)) +
+          geom_errorbar(aes(ymin = li, ymax = ls), width = 0.2, color = col1f, size = 1.2) +
+          geom_point(size = 5, fill=col2f,color = col1f,shape = 21,stroke=2) +
+          labs(title = paste("Intervalo de confianza de 95% para la media de", nombre1),
+               x = "", y = "Media") +
+          theme_cuanti()
+      } else if (nums[nombre2]) {
+        # Ambos numéricos
+        mx = mean(x, na.rm = TRUE)
+        sex = sd(x, na.rm = TRUE) / sqrt(length(x))
+        my = mean(y, na.rm = TRUE)
+        sey = sd(y, na.rm = TRUE) / sqrt(length(y))
+        
+        df_ic = tibble(
+          grupo = c(nombre1, nombre2),
+          media = c(mx, my),
+          li = c(mx - multiplicador * sex, my - multiplicador * sey),
+          ls = c(mx + multiplicador * sex, my + multiplicador * sey)
+        )
+        
+        ggplot(df_ic, aes(x = grupo, y = media)) +
+          geom_errorbar(aes(ymin = li, ymax = ls), width = 0.2, color = col1f, size = 1.2) +
+          geom_point(size = 5, fill=col2f,color = col1f,shape = 21,stroke=2) +
+          labs(title = "Intervalos de confianza de 95% para las medias",
+               x = "Variable", y = "Media") +
+          theme_cuanti()
+      } else {
+        # Y es categórica: medias por grupo
+        df_ic = df |>
+          group_by(.data[[nombre2]]) |>
+          summarise(
+            media = mean(.data[[nombre1]], na.rm = TRUE),
+            li = media - multiplicador * sd(.data[[nombre1]], na.rm = TRUE) / sqrt(n()),
+            ls = media + multiplicador * sd(.data[[nombre1]], na.rm = TRUE) / sqrt(n())
+          )
+        
+        ggplot(df_ic, aes(x = .data[[nombre2]], y = media)) +
+          geom_errorbar(aes(ymin = li, ymax = ls), width = 0.2, color = col1f, size = 1.2) +
+          geom_point(size = 5, fill=col2f,color = col1f,shape = 21,stroke=2) +
+          labs(title = "Intervalos de confianza de 95% para la media",
+               x = nombre2, y = nombre1) +
+          theme_cuanti()
       }
     }
     
-      
   
   #verDataFrame
   output$dataframe <- DT::renderDataTable({
