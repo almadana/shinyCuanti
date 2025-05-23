@@ -234,3 +234,46 @@ attributes(inteli$num.palabras)$label = "Número de palabras de la presentación
 attributes(inteli$tiempo)$label = "Tiempo que pasó el evaluador evaluando el candidato"
 
 save(inteli,file="./data/inteligencia.RData")
+
+
+### World Survey Data --------------
+
+library(readxl)
+
+wvs = read_xlsx("../data/wvs/F00012990-WVS_Wave_7_Uruguay_Excel_v6.0.xlsx")
+colnames(wvs)
+
+selected_vars = c(54,55,86,87,99,100,101,103,104,115,209,218,219,229,224,274,276,279,289,291,299,300,301,317,328,335,336,337)
+wvs = wvs |>  select(all_of(selected_vars))
+
+# diccionario en inglés ----------
+# dic_wvs = read_xlsx("../data/wvs/variables_wvs_uy_2022.xlsx")
+# 
+# colnames(dic_wvs) = "variable"
+# dic_wvs = dic_wvs[selected_vars,]
+#dic_wvs = dic_wvs |> 
+#  separate(variable,into = c("variable","dimension","description"),sep = ": ") |> 
+#  unite(col = "variable",variable,dimension,sep=": ")
+
+#write.csv(dic_wvs,file = "../data/wvs/dic_english.csv")
+
+
+# diccinario en español ---------
+dic_wvs_es = read.csv("../data/wvs/dic_es.csv")
+
+colnames(wvs)
+colnames(dic_wvs_es)
+colnames(wvs) = dic_wvs_es$variable_espanol
+dic_wvs_es
+
+add_labels <- function(df, diccionario) {
+  for (i in seq_along(diccionario$variable_espanol)) {
+    col <- diccionario$variable_espanol[i]
+    label <- diccionario$descripcion_espanol[i]
+    attributes(df[[col]])$label <- label
+  }
+  df
+}
+wvs = add_labels(wvs, dic_wvs_es)
+wvs$pais = "UY"
+save(wvs,file="./data/wvs.RData")

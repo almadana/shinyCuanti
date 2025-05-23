@@ -29,6 +29,7 @@ load("./data/expeCuna.RData")
 load("./data/inteligencia.RData")
 load("./data/wealth.RData")
 load("./data/endis.RData")
+load("./data/wvs.RData")
 
 source("./cuanti_theme.r")
 
@@ -47,7 +48,7 @@ shinyServer(function(input, output,session) {
   #ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
-  listaDeDatos = list("endis"=endis,"censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3)
+  listaDeDatos = list("endis"=endis,"wvs"=wvs,"censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3)
   muestra <- NULL
   
   estado_visible <- reactiveVal(FALSE)
@@ -617,11 +618,11 @@ shinyServer(function(input, output,session) {
   
   #verDataFrame
   output$dataframe <- DT::renderDT({
-    # print("Bingo!")
+     print("Bingo!")
     #print(str(data()[[6]]))
     # print(data()[[6]])
     data()[[6]]
-  },searchDelay = 600)
+  })
   
   
   output$laTabla <- renderUI({

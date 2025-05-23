@@ -25,7 +25,7 @@ diccionario = read_tsv("../data/endis/dict_endis.tsv",col_names = F)
 colnames(diccionario)=c("var","label")
 
 
-## cambiar niveles --------
+## cambiar niveles y elegir variables --------
 
 niveles_ap  = list("Muy en desacuerdo","Ligeramente en desacuerdo","Ni en desacuerdo ni de acuerdo","Ligeramente de acuerdo","Muy de acuerdo")
 
@@ -41,10 +41,14 @@ endis = endis |>
   mutate(across(starts_with("BS"),
                 ~ factor(.x, levels = 1:2, labels = niveles_bs))) |> 
   mutate(across(starts_with("PC"),
-                ~ factor(.x, levels = c(1,2,99), labels = niveles_pc))) 
+                ~ factor(.x, levels = c(1,2,99), labels = niveles_pc))) |> 
+  select(starts_with(c("AP","PC","BS","CSTP")),"SRQ20_total",
+         "apertura_exp","conciencia","neuroticismo","amabilidad","extraversion")
 
 
 #asignar etiquetas
+diccionario=diccionario[-1,]
+
 add_labels <- function(df, diccionario) {
   for (i in seq_along(diccionario$var)) {
     col <- diccionario$var[i]
@@ -54,11 +58,6 @@ add_labels <- function(df, diccionario) {
   df
 }
 endis <- add_labels(endis, diccionario)
-
-attr(endis$PC1_NE_3,"label")
-
-
-
 
 save(endis,file="./data/endis.RData",version=2)
 
