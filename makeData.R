@@ -247,16 +247,16 @@ selected_vars = c(54,55,86,87,99,100,101,103,104,115,209,218,219,220,224,274,276
 wvs = wvs |>  select(all_of(selected_vars))
 
 #diccionario en inglés ----------
-dic_wvs = read_xlsx("../data/wvs/variables_wvs_uy_2022.xlsx",col_names = F)
+# dic_wvs = read_xlsx("../data/wvs/variables_wvs_uy_2022.xlsx",col_names = F)
+# # 
+# colnames(dic_wvs) = "variable"
+# dic_wvs = dic_wvs[selected_vars,]
+# dic_wvs = dic_wvs |> 
+#   separate(variable,into = c("variable","dimension","description"),sep = ": ") |> 
+#   unite(col = "variable",variable,dimension,sep=": ")
 # 
-colnames(dic_wvs) = "variable"
-dic_wvs = dic_wvs[selected_vars,]
-dic_wvs = dic_wvs |> 
-  separate(variable,into = c("variable","dimension","description"),sep = ": ") |> 
-  unite(col = "variable",variable,dimension,sep=": ")
-
-write.csv(dic_wvs,file = "../data/wvs/dic_english.csv")
-
+# write.csv(dic_wvs,file = "../data/wvs/dic_english.csv")
+# 
 
 # diccinario en español ---------
 dic_wvs_es = read.csv("../data/wvs/dic_es.csv")
@@ -311,7 +311,7 @@ wvs = wvs |> mutate(across(contains("Justificable"),.fns = function(x) {
   return(x.f)
 }))
 
-wvs = wvs |> mutate(across(contains("Sistema"),.fns = function(x) {
+wvs = wvs |> mutate(across(contains("Sistema",ignore.case = F),.fns = function(x) {
   x.f = as.factor(x)
   levels(x.f) = c("No contesta","No sabe","Muy bueno","Bueno","Malo","Muy malo")
   return(x.f)
@@ -323,7 +323,7 @@ wvs = wvs |> mutate(across(contains("Es religios",ignore.case = F),.fns = functi
   return(x.f)
 }))
 
-
+wvs$`Q237: Sistema político – gobierno militar`
 wvs = wvs |> mutate(across(contains("Sistema pol",ignore.case = F),.fns = function(x) {
   x.f = as.factor(x)
   levels(x.f) = c("No contesta","No sabe","Muy bueno","Bueno","Malo","Muy malo")
