@@ -317,13 +317,51 @@ wvs = wvs |> mutate(across(contains("Sistema"),.fns = function(x) {
   return(x.f)
 }))
 
+wvs = wvs |> mutate(across(contains("Es religios",ignore.case = F),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","Una persona religiosa","Una persona no religiosa","Un ateo")
+  return(x.f)
+}))
+
+
+wvs = wvs |> mutate(across(contains("Sistema pol",ignore.case = F),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","Muy bueno","Bueno","Malo","Muy malo")
+  return(x.f)
+}))
+
+wvs = wvs |> mutate(across(contains("Importancia de la democracia",ignore.case = F),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","1 - Nada importante",2:9," 10 - Absolutamente importante")
+  return(x.f)
+}))
+
+wvs = wvs |> mutate(across(contains("Satisfacción con sistema pol",ignore.case = F),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","1 - Completamente insatisfecho",2:9," 10 - Completamente satisfecho")
+  return(x.f)
+}))
+
+wvs = wvs |> mutate(across(contains("Sexo",ignore.case = F),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("Hombre","Mujer")
+  return(x.f)
+}))
 
 
 wvs = wvs |> mutate(across(contains("Democracia",ignore.case = F),.fns = function(x) {
   x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","0 - En contra","1 - No esencial",2:9," 10 - Esencial")
+  levels(x.f) = c("No contesta","No sabe","0 - En contra","1 - Izquierda",2:9," 10 - Derecha")
   return(x.f)
 }))
+
+wvs = wvs |> mutate(across(contains("Nivel educativo",ignore.case = F),.fns = function(x) {
+  x.f = as.factor(str_replace(x,"^.*(\\d)$","\\1"))
+  levels(x.f) = c("No contesta","Educación inicial","Primaria","Media básica","Media superior","Terciaria técnica",
+                  "Terciaria técnica","Grado universitario","Posgrado maestría","Posgrado doctorado")
+  return(x.f)
+}))
+
 
 # wvs$`Q251: Qué tan democráticamente se gobierna este país hoy` = as.factor(wvs$`Q251: Qué tan democráticamente se gobierna este país hoy`)
 # levels(wvs$`Q251: Qué tan democráticamente se gobierna este país hoy`) = 
