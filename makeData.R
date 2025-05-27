@@ -1,5 +1,5 @@
 library(foreign)
-library(dplyr)
+library(tidyverse)
 library(haven)
 library(lubridate)
 #dt=read.spss('../data/darkTriad/Triada Obscura.sav',to.data.frame = T)
@@ -243,19 +243,19 @@ library(readxl)
 wvs = read_xlsx("../data/wvs/F00012990-WVS_Wave_7_Uruguay_Excel_v6.0.xlsx")
 colnames(wvs)
 
-selected_vars = c(54,55,86,87,99,100,101,103,104,115,209,218,219,229,224,274,276,279,289,291,299,300,301,317,328,335,336,337)
+selected_vars = c(54,55,86,87,99,100,101,103,104,115,209,218,219,220,224,274,276,279,289,291,299,300,301,317,328,335,336,337)
 wvs = wvs |>  select(all_of(selected_vars))
 
-# diccionario en inglés ----------
-# dic_wvs = read_xlsx("../data/wvs/variables_wvs_uy_2022.xlsx")
+#diccionario en inglés ----------
+dic_wvs = read_xlsx("../data/wvs/variables_wvs_uy_2022.xlsx",col_names = F)
 # 
-# colnames(dic_wvs) = "variable"
-# dic_wvs = dic_wvs[selected_vars,]
-#dic_wvs = dic_wvs |> 
-#  separate(variable,into = c("variable","dimension","description"),sep = ": ") |> 
-#  unite(col = "variable",variable,dimension,sep=": ")
+colnames(dic_wvs) = "variable"
+dic_wvs = dic_wvs[selected_vars,]
+dic_wvs = dic_wvs |> 
+  separate(variable,into = c("variable","dimension","description"),sep = ": ") |> 
+  unite(col = "variable",variable,dimension,sep=": ")
 
-#write.csv(dic_wvs,file = "../data/wvs/dic_english.csv")
+write.csv(dic_wvs,file = "../data/wvs/dic_english.csv")
 
 
 # diccinario en español ---------
@@ -277,4 +277,64 @@ add_labels <- function(df, diccionario) {
 wvs = add_labels(wvs, dic_wvs_es)
 wvs$pais = "UY"
 wvs$pais = as.factor(wvs$pais)
+
+
+# etiquetas de niveles
+# wvs$`Q2 3: Vecinos` = as.factor(wvs$`Q23: Vecinos`)
+# levels(wvs$`Q23: Vecinos`) = c("No le gustaría","No menciona")
+# 
+# wvs$`Q24: Vecinos` = as.factor(wvs$`Q24: Vecinos`)
+# levels(wvs$`Q24: Vecinos`) = c("No le gustaría","No menciona")
+
+wvs = wvs |> mutate(across(contains("Vecinos"),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No le gustaría","No menciona")
+  return(x.f)
+}))
+
+
+wvs = wvs |> mutate(across(contains("Confianza"),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","Mucha","Algo","Poco","Nada")
+  return(x.f)
+}))
+
+wvs = wvs |> mutate(across(contains("Frecuencia"),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","A menudo","A veces","Rara vez","Nunca")
+  return(x.f)
+}))
+
+wvs = wvs |> mutate(across(contains("Justificable"),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","1 - Nunca",2:9," 10 - Siempre")
+  return(x.f)
+}))
+
+wvs = wvs |> mutate(across(contains("Sistema"),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","Muy bueno","Bueno","Malo","Muy malo")
+  return(x.f)
+}))
+
+
+
+wvs = wvs |> mutate(across(contains("Democracia",ignore.case = F),.fns = function(x) {
+  x.f = as.factor(x)
+  levels(x.f) = c("No contesta","No sabe","0 - En contra","1 - No esencial",2:9," 10 - Esencial")
+  return(x.f)
+}))
+
+# wvs$`Q251: Qué tan democráticamente se gobierna este país hoy` = as.factor(wvs$`Q251: Qué tan democráticamente se gobierna este país hoy`)
+# levels(wvs$`Q251: Qué tan democráticamente se gobierna este país hoy`) = 
+#   c("No contesta","No sabe","1 - Nada",2:9," 10 - Completamente")
+# 
+# wvs$`Q253: Respeto por los derechos humanos en la actualidad` = as.factor(wvs$`Q253: Respeto por los derechos humanos en la actualidad`)
+# levels(wvs$`Q253: Respeto por los derechos humanos en la actualidad`) = 
+#   c("No contesta","No sabe","1 - Nada",2:9," 10 - Completamente")
+# 
+# 
+colnames(wvs)
+#removed_vars = c(11)
+
 save(wvs,file="./data/wvs.RData")
