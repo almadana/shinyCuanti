@@ -63,7 +63,7 @@ endis = endis |>
   # mutate(across(starts_with("PC",ignore.case = F),
   #               ~ factor(.x, levels = c(1,2,99), labels = niveles_pc))) |> 
   #select(Formulario,starts_with(c("AP","PC","BS","CSTP")),"SRQ20_total",
-  select(Formulario,"SRQ20_total",
+  select(Formulario,starts_with("CTSP"),"SRQ20_total",
          "apertura_exp","conciencia","neuroticismo","amabilidad","extraversion")
 
 

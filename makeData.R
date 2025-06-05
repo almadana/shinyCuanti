@@ -236,17 +236,19 @@ attributes(inteli$tiempo)$label = "Tiempo que pasó el evaluador evaluando el ca
 save(inteli,file="./data/inteligencia.RData")
 
 
-### World Survey Data --------------
+#-------------- World Survey Data --------------
 
 library(readxl)
 
-wvs = read_xlsx("../data/wvs/F00012990-WVS_Wave_7_Uruguay_Excel_v6.0.xlsx")
+wvs = read_xlsx("../data/wvs/F00012990-WVS_Wave_7_Uruguay_Excel_v6.0.xlsx",na = c(""," ","NA","-2","-1"))
 colnames(wvs)
 
-selected_vars = c(54,55,86,87,99,100,101,103,104,115,209,218,219,220,224,274,276,279,289,291,299,300,301,317,328,335,336,337)
+selected_vars = c(54,55,86,87,99,100,101,103,104,115,209,218,219,220,224,274,276,279,289,291,299,301,317,328,335,336)
 wvs = wvs |>  select(all_of(selected_vars))
 
-#diccionario en inglés ----------
+
+
+## -- diccionario en inglés ----------
 # dic_wvs = read_xlsx("../data/wvs/variables_wvs_uy_2022.xlsx",col_names = F)
 # # 
 # colnames(dic_wvs) = "variable"
@@ -258,7 +260,7 @@ wvs = wvs |>  select(all_of(selected_vars))
 # write.csv(dic_wvs,file = "../data/wvs/dic_english.csv")
 # 
 
-# diccinario en español ---------
+## -- diccinario en español ---------
 dic_wvs_es = read.csv("../data/wvs/dic_es.csv")
 
 colnames(wvs)
@@ -266,21 +268,32 @@ colnames(dic_wvs_es)
 colnames(wvs) = dic_wvs_es$variable_espanol
 dic_wvs_es
 
+colnames(wvs)
+
+vn = colnames(wvs)
+i=1
+dic_wvs_es$variable_espanol[i] %in% vn
+
 add_labels <- function(df, diccionario) {
+  variables_en_df = colnames(df)
+
   for (i in seq_along(diccionario$variable_espanol)) {
-    col <- diccionario$variable_espanol[i]
-    label <- diccionario$descripcion_espanol[i]
-    attributes(df[[col]])$label <- label
+    if (diccionario$variable_espanol[i] %in% variables_en_df){
+      col <- diccionario$variable_espanol[i]
+      label <- diccionario$descripcion_espanol[i]
+      attributes(df[[col]])$label <- label
+    }
   }
   df
 }
-wvs = add_labels(wvs, dic_wvs_es)
-wvs$pais = "UY"
-wvs$pais = as.factor(wvs$pais)
+
+#wvs$pais = "UY"
+#wvs$pais = as.factor(wvs$pais)
 
 
-# etiquetas de niveles
+## etiquetas de niveles-----------
 # wvs$`Q2 3: Vecinos` = as.factor(wvs$`Q23: Vecinos`)
+# 
 # levels(wvs$`Q23: Vecinos`) = c("No le gustaría","No menciona")
 # 
 # wvs$`Q24: Vecinos` = as.factor(wvs$`Q24: Vecinos`)
@@ -295,52 +308,53 @@ wvs = wvs |> mutate(across(contains("Vecinos"),.fns = function(x) {
 
 wvs = wvs |> mutate(across(contains("Confianza"),.fns = function(x) {
   x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","Mucha","Algo","Poco","Nada")
+  levels(x.f) = c("Mucha","Algo","Poco","Nada")
   return(x.f)
 }))
 
 wvs = wvs |> mutate(across(contains("Frecuencia"),.fns = function(x) {
   x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","A menudo","A veces","Rara vez","Nunca")
+  levels(x.f) = c("A menudo","A veces","Rara vez","Nunca")
   return(x.f)
 }))
+levels(as.factor(wvs$`Q182: Justificable – homosexualidad`))
 
-wvs = wvs |> mutate(across(contains("Justificable"),.fns = function(x) {
-  x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","1 - Nunca",2:9," 10 - Siempre")
-  return(x.f)
-}))
+# wvs = wvs |> mutate(across(contains("Justificable"),.fns = function(x) {
+#   x.f = as.factor(x)
+#   levels(x.f) = c("No contesta","No sabe","1 - Nunca",2:9," 10 - Siempre")
+#   return(x.f)
+# }))
 
 wvs = wvs |> mutate(across(contains("Sistema",ignore.case = F),.fns = function(x) {
   x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","Muy bueno","Bueno","Malo","Muy malo")
+  levels(x.f) = c("Muy bueno","Bueno","Malo","Muy malo")
   return(x.f)
 }))
 
 wvs = wvs |> mutate(across(contains("Es religios",ignore.case = F),.fns = function(x) {
   x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","Una persona religiosa","Una persona no religiosa","Un ateo")
+  levels(x.f) = c("Una persona religiosa","Una persona no religiosa","Un ateo")
   return(x.f)
 }))
 
 wvs$`Q237: Sistema político – gobierno militar`
 wvs = wvs |> mutate(across(contains("Sistema pol",ignore.case = F),.fns = function(x) {
   x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","Muy bueno","Bueno","Malo","Muy malo")
+  levels(x.f) = c("Muy bueno","Bueno","Malo","Muy malo")
   return(x.f)
 }))
 
-wvs = wvs |> mutate(across(contains("Importancia de la democracia",ignore.case = F),.fns = function(x) {
-  x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","1 - Nada importante",2:9," 10 - Absolutamente importante")
-  return(x.f)
-}))
+# wvs = wvs |> mutate(across(contains("Importancia de la democracia",ignore.case = F),.fns = function(x) {
+#   x.f = as.factor(x)
+#   levels(x.f) = c("No contesta","No sabe","1 - Nada importante",2:9," 10 - Absolutamente importante")
+#   return(x.f)
+# }))
 
-wvs = wvs |> mutate(across(contains("Satisfacción con sistema pol",ignore.case = F),.fns = function(x) {
-  x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","1 - Completamente insatisfecho",2:9," 10 - Completamente satisfecho")
-  return(x.f)
-}))
+# wvs = wvs |> mutate(across(contains("Satisfacción con sistema pol",ignore.case = F),.fns = function(x) {
+#   x.f = as.factor(x)
+#   levels(x.f) = c("No contesta","No sabe","1 - Completamente insatisfecho",2:9," 10 - Completamente satisfecho")
+#   return(x.f)
+# }))
 
 wvs = wvs |> mutate(across(contains("Sexo",ignore.case = F),.fns = function(x) {
   x.f = as.factor(x)
@@ -349,15 +363,15 @@ wvs = wvs |> mutate(across(contains("Sexo",ignore.case = F),.fns = function(x) {
 }))
 
 
-wvs = wvs |> mutate(across(contains("Democracia",ignore.case = F),.fns = function(x) {
-  x.f = as.factor(x)
-  levels(x.f) = c("No contesta","No sabe","0 - En contra","1 - Izquierda",2:9," 10 - Derecha")
-  return(x.f)
-}))
+# wvs = wvs |> mutate(across(contains("Democracia",ignore.case = F),.fns = function(x) {
+#   x.f = as.factor(x)
+#   levels(x.f) = c("No contesta","No sabe","0 - En contra","1 - Izquierda",2:9," 10 - Derecha")
+#   return(x.f)
+# }))
 
 wvs = wvs |> mutate(across(contains("Nivel educativo",ignore.case = F),.fns = function(x) {
   x.f = as.factor(str_replace(x,"^.*(\\d)$","\\1"))
-  levels(x.f) = c("No contesta","Educación inicial","Primaria","Media básica","Media superior","Terciaria técnica",
+  levels(x.f) = c(NA,"Educación inicial","Primaria","Media básica","Media superior","Terciaria técnica",
                   "Terciaria técnica","Grado universitario","Posgrado maestría","Posgrado doctorado")
   return(x.f)
 }))
@@ -372,7 +386,16 @@ wvs = wvs |> mutate(across(contains("Nivel educativo",ignore.case = F),.fns = fu
 #   c("No contesta","No sabe","1 - Nada",2:9," 10 - Completamente")
 # 
 # 
-colnames(wvs)
+
+wvs$`Q287: Clase social (subjetiva)` = as.factor(wvs$`Q287: Clase social (subjetiva)`)
+levels(wvs$`Q287: Clase social (subjetiva)`) = 
+   c("Clase alta","Clase media alta","Clase media baja","Clase obrera","Clase baja")
+
+
+#colnames(wvs)
 #removed_vars = c(11)
+wvs = add_labels(wvs, dic_wvs_es)
+
 
 save(wvs,file="./data/wvs.RData")
+
