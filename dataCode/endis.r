@@ -21,11 +21,31 @@ library(tidyverse)
 library(readxl)
 
 endis = read_xlsx("../data/endis/cse_endis_informante_subset.xlsx")
+niños = read.csv("../data/endis/Datos - Base Niños - Ronda 1.csv",sep = ";")
 diccionario = read_tsv("../data/endis/dict_endis.tsv",col_names = F)
-colnames(diccionario)=c("var","label")
+nombres_vars_niños = read.csv("../data/endis/dic_niños_mini_var.csv",header = F) |> pull()
+nombres_nuevos_niños = read.csv("../data/endis/dic_niños_mini.csv",sep="\t",header = F)
+colnames(nombres_nuevos_niños)=c("var","label")
+
+
+# base de niños
+niños = niños |> select(Formulario,all_of(nombres_vars_niños))
+
+
+niños = niños |> 
+  mutate(across(starts_with("r",ignore.case = F),
+                ~ factor(.x, levels = 1:3, labels = c("Normal","Riesgo","Clínico")))) |>
+  mutate(across(starts_with("ASQ",ignore.case = F),
+                ~ factor(.x, levels = 1:3, labels = c("Riesgo","Zona de monitoreo","Normal")))) |>
+  mutate(across(contains("asq",ignore.case = F),
+                ~ factor(.x, levels = 1:2, labels = c("Normal","Riesgo"))))
+
+colnames(niños) = c("Formulario",nombres_nuevos_niños$var)
 
 
 ## cambiar niveles y elegir variables --------
+
+colnames(diccionario)=c("var","label")
 
 niveles_ap  = list("Muy en desacuerdo","Ligeramente en desacuerdo","Ni en desacuerdo ni de acuerdo","Ligeramente de acuerdo","Muy de acuerdo")
 
@@ -36,13 +56,14 @@ niveles_pc = list("Si","No","Ns/Nc")
 
 
 endis = endis |> 
-  mutate(across(starts_with("AP"),
-                ~ factor(.x, levels = 1:5, labels = niveles_ap))) |> 
-  mutate(across(starts_with("BS"),
-                ~ factor(.x, levels = 1:2, labels = niveles_bs))) |> 
-  mutate(across(starts_with("PC"),
-                ~ factor(.x, levels = c(1,2,99), labels = niveles_pc))) |> 
-  select(starts_with(c("AP","PC","BS","CSTP")),"SRQ20_total",
+  # mutate(across(starts_with("AP",ignore.case = F),
+  #               ~ factor(.x, levels = 1:5, labels = niveles_ap))) |> 
+  # mutate(across(starts_with("BS",ignore.case = F),
+  #               ~ factor(.x, levels = 1:2, labels = niveles_bs))) |> 
+  # mutate(across(starts_with("PC",ignore.case = F),
+  #               ~ factor(.x, levels = c(1,2,99), labels = niveles_pc))) |> 
+  #select(Formulario,starts_with(c("AP","PC","BS","CSTP")),"SRQ20_total",
+  select(Formulario,"SRQ20_total",
          "apertura_exp","conciencia","neuroticismo","amabilidad","extraversion")
 
 
@@ -50,14 +71,24 @@ endis = endis |>
 diccionario=diccionario[-1,]
 
 add_labels <- function(df, diccionario) {
+  variables_en_df = colnames(df)
   for (i in seq_along(diccionario$var)) {
-    col <- diccionario$var[i]
-    label <- diccionario$label[i]
-    attributes(df[[col]])$label <- label
+    if (diccionario$var[i] %in% variables_en_df){
+      col <- diccionario$var[i]
+      label <- diccionario$label[i]
+      attributes(df[[col]])$label <- label
+    }
   }
   df
 }
+
 endis <- add_labels(endis, diccionario)
+niños <- add_labels(niños,nombres_nuevos_niños)
+
+
+endis = endis |> 
+  left_join(niños,by="Formulario")|>
+  select(-Formulario)
 
 save(endis,file="./data/endis.RData",version=2)
 
