@@ -229,7 +229,7 @@ shinyServer(function(input, output,session) {
   
     umbralRecorte = 50 #máximo número de caracteres para display a full de niveles de variables categóricas
     recortarCaracteres <- function(x) {
-      if (nhcar(x)>umbralRecorte) {
+      if (nchar(x)>umbralRecorte) {
         x=paste(substr(x,0,umbralRecorte),"...",sep="")
       }
       return(x)
