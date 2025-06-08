@@ -24,12 +24,13 @@ load("./data/darkTriad.RData")
 load("./data/serce.RData")
 load("./data/latino.RData")
 load("./data/encuesta.RData")
-load("./data/miniBase.RData")
-load("./data/expeCuna.RData")
-load("./data/inteligencia.RData")
-load("./data/wealth.RData")
+#load("./data/miniBase.RData")
+#load("./data/expeCuna.RData")
+#load("./data/inteligencia.RData")
+#load("./data/wealth.RData")
 load("./data/endis.RData")
 load("./data/wvs.RData")
+load('./data/Aristas.RData')
 
 source("./cuanti_theme.r")
 
@@ -50,7 +51,9 @@ shinyServer(function(input, output,session) {
   #ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
-  listaDeDatos = list("endis"=endis,"wvs"=wvs,"censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,"encuestaCuanti"=encuesta1,"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3)
+  listaDeDatos = list("endis"=endis,"wvs"=wvs,"censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,
+                      "encuestaCuanti"=encuesta1,#"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3
+                      "aristas"=aristas)
   muestra <- NULL
   
   estado_visible <- reactiveVal(FALSE)

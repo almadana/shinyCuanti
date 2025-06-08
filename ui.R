@@ -23,11 +23,13 @@ shinyUI(fluidPage(theme="cuanti.css",
         column(3,
                wellPanel("Datos",
                          selectInput("selectorDatos","Elegir base de datos",
-                                     c("ENDIS"="endis","SERCE"="serce","Encuesta mundial de valores"="wvs","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1",
-                                       "Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti",
-                                       "Mini-base de estudiantes de seminarios"="miniBase","Experimento: bebés y melodías"="expeCuna",
-                                       "Experimento: audio vs. transcripción"="inteligencia",
-                                       "Percepción de desigualdad y riqueza"="riqueza"),
+                                     c("ENDIS"="endis","SERCE"="serce","Encuesta mundial de valores"="wvs","Tríada oscura"="triada",
+                                       "Aristas"="aristas","Latinobarómetro"="latinoBaro1",
+                                       "Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti"
+                                       #"Mini-base de estudiantes de seminarios"="miniBase","Experimento: bebés y melodías"="expeCuna",
+                                       #"Experimento: audio vs. transcripción"="inteligencia",
+                                       #"Percepción de desigualdad y riqueza"="riqueza"
+                                       ),
                                      selected = "")
                          )
                ),
