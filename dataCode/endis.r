@@ -38,7 +38,7 @@ niños = niños |>
   mutate(across(starts_with("ASQ",ignore.case = F),
                 ~ factor(.x, levels = 1:3, labels = c("Riesgo","Zona de monitoreo","Normal")))) |>
   mutate(across(contains("asq",ignore.case = F),
-                ~ factor(.x, levels = 1:2, labels = c("Normal","Riesgo"))))
+                ~ factor(.x, levels = 0:1, labels = c("Normal","Riesgo"))))
 
 colnames(niños) = c("Formulario",nombres_nuevos_niños$var)
 

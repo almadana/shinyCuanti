@@ -24,7 +24,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                wellPanel("Datos",
                          selectInput("selectorDatos","Elegir base de datos",
                                      c("ENDIS"="endis","SERCE"="serce","Encuesta mundial de valores"="wvs","Tríada oscura"="triada",
-                                       "Aristas"="aristas","Latinobarómetro"="latinoBaro1",
+                                       "Aristas"="aristas",#"Latinobarómetro"="latinoBaro1",
                                        "Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti"
                                        #"Mini-base de estudiantes de seminarios"="miniBase","Experimento: bebés y melodías"="expeCuna",
                                        #"Experimento: audio vs. transcripción"="inteligencia",
@@ -38,6 +38,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                wellPanel(
                     #mainPanel(
                       actionButton("toggleSidebar", "Mostrar resumen"),
+                      actionButton("mostrar_desc", "Acerca de la base"),
                         div(id="tabla_resumen",style = "display: none;",
                           conditionalPanel(
                              condition = "output.dataSelected",

@@ -24,6 +24,7 @@ load("./data/darkTriad.RData")
 load("./data/serce.RData")
 load("./data/latino.RData")
 load("./data/encuesta.RData")
+load("./data/descripciones.RData")
 #load("./data/miniBase.RData")
 #load("./data/expeCuna.RData")
 #load("./data/inteligencia.RData")
@@ -48,13 +49,33 @@ currentDataset = censoFil
 shinyServer(function(input, output,session) {
   tablaKey <- reactiveVal(0)
   
+  #nombre_bases = c("endis"="ENDIS","serce"="SERCE","wvs"="Encuesta mundial de valores","triada"="Tríada oscura",
+  #                 "aristas"="Aristas","latinoBaro1"="Latinobarómetro",
+  #                 "censo"="Censo Nacional de Psicólogos","encuestaCuanti"="Encuesta estudiantes de cuanti")
+  
   #ga_collect_pageview(page = "/panel", title = "Panel", hostname = "cuanti.psico.edu.uy")
   
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
-  listaDeDatos = list("endis"=endis,"wvs"=wvs,"censo"=censoFil,"triada"=dt,"serce"=serce,"latinoBaro1"=latino,
+  listaDeDatos = list("endis"=endis,"wvs"=wvs,"censo"=censoFil,"triada"=dt,"serce"=serce,#"latinoBaro1"=latino,
                       "encuestaCuanti"=encuesta1,#"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3
                       "aristas"=aristas)
   muestra <- NULL
+  
+  
+  observeEvent(input$mostrar_desc,{
+    nombre <- input$selectorDatos
+    n_base = which(descripciones$base == nombre)
+    texto_modal = descripciones$html_descripcion[n_base]
+    
+    showModal(modalDialog(
+      title = "Acerca de la base de datos",
+      HTML(texto_modal),
+      easyClose = TRUE,
+      footer = modalButton("Cerrar")
+    ))
+    
+  })
+  
   
   estado_visible <- reactiveVal(FALSE)
   
