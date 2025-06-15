@@ -7,4 +7,5 @@
 *.gz
 *.log
 
+.idea/*
 .Rproj.user
