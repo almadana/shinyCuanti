@@ -403,9 +403,9 @@ save(wvs,file="./data/wvs.RData")
 
 # Aristas----
 # Cargar Aristas y el diccionario
-load("Aristas.RData") # carga datos_final
+load("../data/aristas/aristas/Aristas.RData") # carga datos_final
 
-diccionario <- read.csv("diccionario.csv", stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+diccionario <- read.csv("../data/aristas/aristas/diccionario.csv", stringsAsFactors = FALSE, fileEncoding = "UTF-8")
 # Filtrar solo las variables presentes en datos_final
 dic_aristas <- diccionario[diccionario$var %in% names(datos_final), ]
 
@@ -427,5 +427,5 @@ if (exists("add_labels")) {
     }
   }
 }
-
-save(datos_final, file = "./data/Aristas.RData")
+aristas=datos_final
+save(aristas, file = "./data/Aristas.RData")

@@ -231,7 +231,8 @@ shinyServer(function(input, output,session) {
       
       niveles=unlist(lapply(b,function(x) if (!is.null(x)) { paste(x,collapse = ", ") }))
       niveles = sapply(niveles,function(x) {
-        if (nchar(x)>50) {
+        print(x)
+        if (nchar(x,type="chars")>50) {
           x=paste(substr(x,0,50),"...",sep="") }
         return(x)
       })
