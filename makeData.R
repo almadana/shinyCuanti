@@ -2,6 +2,8 @@ library(foreign)
 library(tidyverse)
 library(haven)
 library(lubridate)
+
+# Triada Oscura ----
 #dt=read.spss('../data/darkTriad/Triada Obscura.sav',to.data.frame = T)
 dt=read_sav('../data/darkTriad/Triada Obscura.sav')
 dt=as_factor(dt)
@@ -9,7 +11,7 @@ View(dt)
 sum(is.na(dt$Refleja2))
 dt=dt[complete.cases(dt),]
 save(dt,file='./data/darkTriad.RData')
-
+# SERCE ----
 serce=read.spss('../data/serce/SERCE - Uruguay - sin missing.sav',to.data.frame = T)
 serce2=read_sav('../data/serce/SERCE - Uruguay - sin missing.sav')
 serce2=as_factor(serce2)
@@ -17,6 +19,7 @@ View(serce2)
 serce=serce2
 save(serce,file="./data/serce.RData")
 
+# Censo ----
 load('../censo.RData')
 
 colnames(censo)
@@ -69,7 +72,7 @@ table(censoFil$Sexo,censoFil$Estado_conyugal)
 
 
 
-#encuestaCuanti
+#encuestaCuanti----
 encuesta=read.csv("./data/encuestaCuanti.csv")
 head(encuesta)
 colnames(encuesta)=c("timestamp","Sexo","Edad","Dep.residencia","Barrio.vive","Liceo","Trabaja","Salario","Edad.meses","ESV1","ESV2","ESV3","ESV4","ESV5","N.Personas.vive","Horas.sueño","ud.es")
@@ -121,7 +124,6 @@ save(miniBase,file="./data/miniBase.RData")
 
 
 ## - music babies ----
-
 
 
 music = read.csv(file = "../data/musicBabies/Mehr Song and Spelke 2016 Experiment 1.csv")
@@ -399,3 +401,31 @@ wvs = add_labels(wvs, dic_wvs_es)
 
 save(wvs,file="./data/wvs.RData")
 
+# Aristas----
+# Cargar Aristas y el diccionario
+load("Aristas.RData") # carga datos_final
+
+diccionario <- read.csv("diccionario.csv", stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+# Filtrar solo las variables presentes en datos_final
+dic_aristas <- diccionario[diccionario$var %in% names(datos_final), ]
+
+# Mostrar advertencia si alguna variable del diccionario no está en datos_final
+vars_faltantes <- setdiff(diccionario$var, names(datos_final))
+if (length(vars_faltantes) > 0) {
+  warning(paste("Variables del diccionario no encontradas en datos_final:", paste(vars_faltantes, collapse=", ")))
+}
+
+# Si existe la función add_labels, la usamos. Si no, etiquetamos manualmente:
+if (exists("add_labels")) {
+  datos_final <- add_labels(datos_final, dic_aristas)
+} else {
+  for (i in seq_len(nrow(dic_aristas))) {
+    var_name <- dic_aristas$var[i]
+    label <- dic_aristas$etiqueta[i]
+    if (var_name %in% names(datos_final)) {
+      attr(datos_final[[var_name]], "label") <- label
+    }
+  }
+}
+
+save(datos_final, file = "./data/Aristas.RData")
