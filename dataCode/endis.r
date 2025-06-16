@@ -26,6 +26,10 @@ diccionario = read_tsv("../data/endis/dict_endis.tsv",col_names = F)
 nombres_vars_niños = read.csv("../data/endis/dic_niños_mini_var.csv",header = F) |> pull()
 nombres_nuevos_niños = read.csv("../data/endis/dic_niños_mini.csv",sep="\t",header = F)
 colnames(nombres_nuevos_niños)=c("var","label")
+colnames(diccionario)=c("var","label")
+
+etiquetas = read.csv("../data/endis/etiquetas.csv",sep=";")
+#diccinario=rbind(diccionario,etiquetas[,c(1,3)])
 
 
 # base de niños
@@ -45,7 +49,6 @@ colnames(niños) = c("Formulario",nombres_nuevos_niños$var)
 
 ## cambiar niveles y elegir variables --------
 
-colnames(diccionario)=c("var","label")
 
 niveles_ap  = list("Muy en desacuerdo","Ligeramente en desacuerdo","Ni en desacuerdo ni de acuerdo","Ligeramente de acuerdo","Muy de acuerdo")
 
@@ -85,10 +88,11 @@ add_labels <- function(df, diccionario) {
 endis <- add_labels(endis, diccionario)
 niños <- add_labels(niños,nombres_nuevos_niños)
 
-
 endis = endis |> 
   left_join(niños,by="Formulario")|>
   select(-Formulario)
+
+colnames(endis)[colnames(endis) %in% etiquetas$var] = etiquetas$panel
 
 save(endis,file="./data/endis.RData",version=2)
 
