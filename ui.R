@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(shinyWidgets)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme="cuanti.css",
@@ -22,15 +23,20 @@ shinyUI(fluidPage(theme="cuanti.css",
       fluidRow(
         column(3,
                wellPanel("Datos",
-                         selectInput("selectorDatos","Elegir base de datos",
-                                     c("ENDIS"="endis","SERCE"="serce","Encuesta mundial de valores"="wvs","Tríada oscura"="triada",
-                                       "Aristas"="aristas",#"Latinobarómetro"="latinoBaro1",
-                                       "Censo Nacional de Psicólogos"="censo","Encuesta estudiantes de cuanti"="encuestaCuanti"
-                                       #"Mini-base de estudiantes de seminarios"="miniBase","Experimento: bebés y melodías"="expeCuna",
-                                       #"Experimento: audio vs. transcripción"="inteligencia",
-                                       #"Percepción de desigualdad y riqueza"="riqueza"
-                                       ),
-                                     selected = "")
+                         pickerInput("selectorDatos", "Elegir base de datos",
+                                     choices = c("ENDIS" = "endis",
+                                                 "SERCE" = "serce",
+                                                 "Encuesta mundial de valores" = "wvs",
+                                                 "Tríada oscura" = "triada",
+                                                 "Aristas" = "aristas",
+                                                 "Censo Nacional de Psicólogos" = "censo",
+                                                 "Encuesta estudiantes de cuanti" = "encuestaCuanti"),
+                                     selected = NULL,
+                                     options = list(
+                                       #`live-search` = TRUE,
+                                       `mobile` = TRUE  # mejora el comportamiento en móviles
+                                       )
+                                    )
                          )
                ),
         column(9, #panel de RESUMEN - Nombre de variables, tipo, y niveles (min-max)
