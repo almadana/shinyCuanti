@@ -58,7 +58,7 @@ shinyUI(fluidPage(theme="cuanti.css",
       ),
       fluidRow(
         column(3,wellPanel("Análisis",
-                           selectInput("analisis","Elegir análisis",
+                           pickerInput("analisis","Elegir análisis",
                                        c("Ver datos"="ver",
                                          "Descriptivo"="descriptivo",
                                          "Histograma"="histograma",
@@ -67,7 +67,11 @@ shinyUI(fluidPage(theme="cuanti.css",
                                          "Gráfico de barras"="gbar",
                                          "Diagrama de caja"="boxplot",
                                          "Intervalos de confianza para la media"="intconf",
-                                         "Gráfico de dispersión"="dispersion")),
+                                         "Gráfico de dispersión"="dispersion"),
+                                       options = list(
+                                         `mobile` = TRUE  # mejora el comportamiento en móviles
+                                       )
+                                       ),
                            checkboxInput("muestrear",
                                          label="Tomar muestra aleatoria"
                                          ),
@@ -84,8 +88,12 @@ shinyUI(fluidPage(theme="cuanti.css",
                           conditionalPanel(
                             condition = "output.dataSelected",
                             # placeholders will be replaced from the server
-                            selectInput("var1", "Elegir variable 1", "placeholder 1"),
-                            selectInput("var2", "Elegir variable 2", NULL)
+                            pickerInput("var1", "Elegir variable 1", "placeholder 1",options = list(
+                              `mobile` = TRUE  # mejora el comportamiento en móviles
+                            )),
+                            pickerInput("var2", "Elegir variable 2", NULL,options = list(
+                              `mobile` = TRUE  # mejora el comportamiento en móviles
+                            ))
                           ),
                   actionButton("goButton","Analizar!")
             )

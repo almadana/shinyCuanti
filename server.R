@@ -194,8 +194,8 @@ shinyServer(function(input, output,session) {
     
     observeEvent(dataSet(), {
       varsCDs=colnames(dataSet())
-      updateSelectInput(session, "var1", choices = varsCDs)
-      updateSelectInput(session, "var2", choices = varsCDs)
+      updatePickerInput(session, "var1", choices = varsCDs)
+      updatePickerInput(session, "var2", choices = varsCDs)
     })
     
     #--- trigger de actualizador var-selector 1y2 ----
