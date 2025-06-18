@@ -458,16 +458,14 @@ shinyServer(function(input, output,session) {
     })
     
     
-    
+    #  - GRÁFICOS DE BARRAS--------
+    #  función para hacer los gráficos de barr
     hacerGrafBarras = function() {
       nombre.x = data()[[3]]
       nombre.y = data()[[4]]
       df = data()[[6]]
     
-      
-      
-      
-        
+
       if (input$var2==input$var1) {
         nombre=data()[[3]]
         tab=table(data()[[1]])
@@ -499,6 +497,7 @@ shinyServer(function(input, output,session) {
             p_bar = df %>% 
               group_by(.data[[nombre.x]],.data[[nombre.y]]) %>% 
               summarise(n = n(), .groups = "drop") %>%
+              group_by(.data[[nombre.x]]) %>% 
               mutate(porcentaje = n / sum(n)) %>% 
               ggplot(aes(x = .data[[nombre.x]], y=porcentaje,fill = .data[[nombre.y]])) +
               geom_bar(stat = "identity", position = position_dodge()) +
