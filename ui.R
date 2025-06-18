@@ -32,9 +32,9 @@ shinyUI(fluidPage(theme="cuanti.css",
                                                  "Censo Nacional de Psicólogos" = "censo",
                                                  "Encuesta estudiantes de cuanti" = "encuestaCuanti"),
                                      selected = NULL,
-                                     options = list(
+                                     options = pickerOptions(
                                        #`live-search` = TRUE,
-                                       `mobile` = TRUE  # mejora el comportamiento en móviles
+                                       mobile = TRUE  # mejora el comportamiento en móviles
                                        )
                                     )
                          )
@@ -68,8 +68,9 @@ shinyUI(fluidPage(theme="cuanti.css",
                                          "Diagrama de caja"="boxplot",
                                          "Intervalos de confianza para la media"="intconf",
                                          "Gráfico de dispersión"="dispersion"),
-                                       options = list(
-                                         `mobile` = TRUE  # mejora el comportamiento en móviles
+                                       options = pickerOptions(
+                                         mobile = TRUE,  # mejora el comportamiento en móviles
+                                         noneSelectedText = "Nada elegido aún"
                                        )
                                        ),
                            checkboxInput("muestrear",
@@ -88,11 +89,14 @@ shinyUI(fluidPage(theme="cuanti.css",
                           conditionalPanel(
                             condition = "output.dataSelected",
                             # placeholders will be replaced from the server
-                            pickerInput("var1", "Elegir variable 1", "placeholder 1",options = list(
-                              `mobile` = TRUE  # mejora el comportamiento en móviles
+                            pickerInput("var1", "Elegir variable 1", "placeholder 1",
+                                        options = pickerOptions(
+                              mobile = TRUE,  # mejora el comportamiento en móviles
+                              noneSelectedText = "Nada elegido aún"
                             )),
-                            pickerInput("var2", "Elegir variable 2", NULL,options = list(
-                              `mobile` = TRUE  # mejora el comportamiento en móviles
+                            pickerInput("var2", "Elegir variable 2", NULL,options = pickerOptions(
+                              mobile = TRUE,  # mejora el comportamiento en móviles
+                              noneSelectedText = "Nada elegido aún"
                             ))
                           ),
                   actionButton("goButton","Analizar!")
