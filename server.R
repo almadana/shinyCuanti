@@ -537,6 +537,7 @@ shinyServer(function(input, output,session) {
       nombre1 = data()[[3]]
       nombre2 = data()[[4]]
       nums = struct()[[3]]
+      nombre_vars = c(nombre1,nombre2)
       
       if (input$var2 == input$var1) {
         # Univariado
@@ -549,15 +550,18 @@ shinyServer(function(input, output,session) {
       } else {
         if (nums[nombre2]) {
           # Ambos numéricos: mostramos como dos boxplots lado a lado
-          df2 = tibble(variable = c(nombre1, nombre2),
-                       valor = c(x, y))
-          medias = df2 |>
-            group_by(variable) |>
-            summarise(media = mean(valor, na.rm = TRUE))
+          #df2 = tibble(variable = c(nombre1, nombre2),
+          #             valor = c(x, y))
           
-          ggplot(df2, aes(x = variable, y = valor)) +
+          # df con las medias por variable, en long
+          medias = df |> summarise(across(all_of(nombre_vars),mean)) |> 
+            pivot_longer(nombre_vars)          
+          
+          #df en long
+          df2 = df |> select(all_of(nombre_vars)) |> pivot_longer(nombre_vars)
+          ggplot(df2, aes(x = name, y = value)) +
             geom_boxplot(fill = col1) +
-            geom_point(data = medias, aes(x = variable, y = media), 
+            geom_point(data = medias, 
                        color = col2f, size = 3) +
             labs(x = "Variable", y = "Valores", title = "Diagrama de caja") +
             theme_cuanti()
