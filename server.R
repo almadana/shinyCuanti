@@ -99,35 +99,39 @@ shinyServer(function(input, output,session) {
   
     #--- cargar data() ----
         data <- eventReactive(input$goButton,{
-      x=dataSet()
-      if (!is.null(muestra())) {
-        x = x[muestra(),]
-      }
-      if (!is.null(input$var1)) {
-        v1=pull(x,input$var1) #when data is tibble, this makes v1 a vector, not a 1-d tibble...
-        v1name=input$var1
-      }
-      else {
+        df=dataSet()
         v1=NULL
         v1name=NULL
-      }
-      if (input$var2!="") {
-        #print(input$var2)
-        v2=pull(x,input$var2)
-        v2name=input$var2
-      }
-      else {
         v2=NULL
         v2name=NULL
-      }
-      anali=input$analisis
+        
+        if (!is.null(muestra())) {
+          df = df[muestra(),]
+        }
+        if (!is.null(input$var1)) {
+          v1name=input$var1
+          if (!is.null(input$var2)) { # if v2 can be not null only if v1 is
+            #print(input$var2)
+            v2name=input$var2
+            df = df |> drop_na(all_of(c(v1name,v2name)))
+            v2 = df |> pull(v2name)
+          }
+          else { # only v1 is not null
+            df = df |> drop_na(all_of(v1name))
+          
+          }
+          v1 = df |> pull(v1name)
+        }
+        anali=input$analisis
 #      print(anali)
       ##########################################################
       # 1- var1, 2-var2, 3-var1name, 4-var2name, 5-anali, 6-data
       #########################################################
-      list(v1,v2,v1name,v2name,anali,x)
-    }
+        list(v1,v2,v1name,v2name,anali,df)
+      }
     )
+    
+    
     observeEvent(input$goButton, {
       tablaKey(tablaKey() + 1)
     })
@@ -143,6 +147,9 @@ shinyServer(function(input, output,session) {
     
     
     #--- cargar struct() ----
+    # a: tipos de variable
+    # b: lista de niveles de categóricas
+    # numericas: TRUE con variables numéricas
     struct <- eventReactive(dataSet(),{
         a=unlist(lapply(dataSet(),class))
         b=(lapply(dataSet(),levels))
@@ -210,13 +217,29 @@ shinyServer(function(input, output,session) {
       varsCDs=colnames(dataSet())
       nums=struct()[[3]] #variables numericas
       todas=!logical(length(nums))
-      elegibles1=switch(input$analisis,"ver"=NULL,"descriptivo"=NULL,"histograma"=nums,
-                        "tablaF1"=!nums,"tablaF2"=!nums,"gbar"=!nums,"boxplot"=nums,"intconf"=nums,"dispersion"=nums)    
-      elegibles2=switch(input$analisis,"ver"=NULL,"descriptivo"=NULL,"histograma"=NULL,
-                        "tablaF1"=NULL,"tablaF2"=!nums,"gbar"=!nums,"boxplot"=todas,"intconf"=todas,"dispersion"=nums)    
+      elegibles1=switch(input$analisis,
+                        "ver"=NULL,
+                        "descriptivo"=NULL,
+                        "histograma"=nums,
+                        "tablaF1"=!nums,
+                        "tablaF2"=!nums,
+                        "gbar"=!nums,
+                        "boxplot"=nums,
+                        "intconf"=nums,
+                        "dispersion"=nums)    
+      elegibles2=switch(input$analisis,
+                        "ver"=NULL,
+                        "descriptivo"=NULL,
+                        "histograma"=NULL,
+                        "tablaF1"=NULL,
+                        "tablaF2"=!nums,
+                        "gbar"=!nums,
+                        "boxplot"=todas,
+                        "intconf"=todas,
+                        "dispersion"=nums)    
       
-      updateSelectInput(session, "var1", choices = varsCDs[elegibles1])
-      updateSelectInput(session, "var2", choices = c(varsCDs[elegibles2] ))
+      updatePickerInput(session, "var1", choices = varsCDs[elegibles1])
+      updatePickerInput(session, "var2", choices = c(varsCDs[elegibles2] ))
     }
     
     #---- actualizar tabla de sumario ----
@@ -370,9 +393,9 @@ shinyServer(function(input, output,session) {
   #funciones de gráficas
     hacerHistograma = function() {
       #print(data())
-      d = data()[[1]] # variable elegida (datos)
       df = data()[[6]] # el data frame posta
       nombre = data()[[3]] # nombre de variable para hacer el histograma
+      d = df[[nombre]] # variable elegida (datos)
       n_bins = input$bins
       # generate bins based on input$bins from ui.R
       bins <- seq(min(d,na.rm=T), max(d,na.rm=T), length.out = input$bins + 1)
@@ -402,12 +425,10 @@ shinyServer(function(input, output,session) {
     }
 
     hacerDispersion = function() {
-      x = data()[[1]]
-      y = data()[[2]]
       nombre.x = data()[[3]]
       nombre.y = data()[[4]]
       df = data()[[6]] # el data frame posta
-
+      
       
       
       pointSize = input$pointSize
@@ -424,6 +445,7 @@ shinyServer(function(input, output,session) {
     }
     
     output$coefCorrel1 <- renderText({
+      df = data()[6]
       x = data()[[1]]
       y = data()[[2]]
       paste("El coeficiente de correlación de Pearson es:",round(cor(x,y,use = "pairwise.complete.obs"),2))
