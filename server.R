@@ -16,9 +16,8 @@ col1f = "#6446fa"
 col2f = "#9bfa82"
 
 library(shiny)
-library(ggplot2)
 library(htmlTable)
-library(dplyr)
+library(tidyverse)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
 load("./data/serce.RData")
