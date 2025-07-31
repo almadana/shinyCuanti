@@ -404,7 +404,7 @@ shinyServer(function(input, output,session) {
       #print(d)
       #print(is.numeric(d))
       #print(df[nombre])
-      p_h = ggplot(df,aes(x=.data[[nombre]])) + geom_histogram(aes(y = ..density..), bins = n_bins,fill=col1f,col=col2f) + labs(x = nombre,
+      p_h = ggplot(df,aes(x=.data[[nombre]])) + geom_histogram(bins = n_bins,fill=col1f,col=col2f) + labs(x = nombre,
                                                                             y = "frecuencia",
                                                                             title = titulo) + 
         theme_cuanti()
