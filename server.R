@@ -742,7 +742,7 @@ shinyServer(function(input, output,session) {
     #print(str(data()[[6]]))
     # print(data()[[6]])
     #data()[[6]]
-    DT::datatable(data()[[6]], rownames = FALSE, escape = FALSE, options = list(pageLength = 10))
+    DT::datatable(data()[[6]] %>% mutate(across(where(is.numeric), ~round(., 2))), rownames = FALSE, escape = FALSE, options = list(pageLength = 10))
 
   })
   # 
