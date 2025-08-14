@@ -404,11 +404,6 @@ shinyServer(function(input, output,session) {
       #print(d)
       #print(is.numeric(d))
       #print(df[nombre])
-      p_h = ggplot(df,aes(x=.data[[nombre]])) + geom_histogram(bins = n_bins,fill=col1f,col=col2f) + labs(x = nombre,
-                                                                            y = "frecuencia",
-                                                                            title = titulo) + 
-        theme_cuanti()
-      
       if (input$ajusteNormal) {
         media_d = mean(d, na.rm = TRUE)
         sd_d = sd(d, na.rm = TRUE)
@@ -417,8 +412,23 @@ shinyServer(function(input, output,session) {
         x_seq = seq(min(d, na.rm = TRUE), max(d, na.rm = TRUE), length.out = 100)
         norm_data = tibble(x = x_seq, y = dnorm(x_seq, mean = media_d, sd = sd_d))
         
+        p_h = ggplot(df,aes(x=.data[[nombre]])) + geom_histogram(aes(y=..density..),bins = n_bins,fill=col1f,col=col2f) + 
+          labs(x = nombre,
+               y = "densitdad",
+               title = titulo) + 
+          theme_cuanti()
+        
+        
+        
         # Agregar la curva normal
         p_h = p_h + geom_line(data = norm_data, aes(x = x, y = y), color = col2f, size = 1)
+      }
+      else {
+        p_h = ggplot(df,aes(x=.data[[nombre]])) + geom_histogram(bins = n_bins,fill=col1f,col=col2f) + labs(x = nombre,
+                                                                                                            y = "frecuencia",
+                                                                                                            title = titulo) + 
+          theme_cuanti()
+        
       }
       show(p_h)
     }
