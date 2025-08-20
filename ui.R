@@ -9,6 +9,7 @@
 
 library(shiny)
 library(shinyWidgets)
+library(gt)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme="cuanti.css",
@@ -174,7 +175,8 @@ shinyUI(fluidPage(theme="cuanti.css",
                            
           
           conditionalPanel(condition="output.anali == 'tablaF1' || output.anali == 'tablaF2' || output.anali == 'descriptivo' ",
-                           htmlOutput("laTabla")),
+                           #htmlOutput("laTabla")),
+                           gt_output("gtable")),
           
           
           conditionalPanel("output.anali == 'histograma' || output.anali == 'gbar' || output.anali == 'boxplot' || output.anali == 'intconf'|| output.anali == 'dispersion'",

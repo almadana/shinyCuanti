@@ -44,3 +44,49 @@ scale_color_categorical <- function(...){
   discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 }
 
+
+require(gt)
+
+gt_theme_cuanti <- function(gtobj, realce = "#6C3BF6",fondo="#e7e6ff",violeta="#b4a5fa") {
+  gtobj |>
+    #tab_style(
+     #  style = list(cell_borders(sides = "bottom", weight = px(3), color = violeta)),
+     #  locations = list(cells_column_labels(everything()),
+     #                   cells_stubhead()) 
+     # ) |>
+     # tab_style(
+     #   style = list( cell_borders(sides = c("top","bottom"), weight = px(1), color = violeta)),
+     #    locations = list(cells_body(everything()),
+     #         cells_stub(),
+     #         cells_grand_summary(everything()),
+     #         cells_stub_grand_summary()
+     #       ) 
+     #    
+     #   
+     #  ) |>
+    tab_style(
+      style = cell_text(weight = "bolder"),locations = cells_title()
+    ) |> 
+    tab_style(style = cell_text(weight = "bold"),
+              locations = list(cells_column_spanners(),
+                               cells_stubhead()) ) |> 
+    tab_options(
+      table.border.bottom.color = violeta,
+      table.border.top.color = violeta,
+      grand_summary_row.border.color  = violeta,
+      grand_summary_row.border.width = px(0),
+      grand_summary_row.background.color = fondo,
+      column_labels.background.color = fondo,
+      column_labels.border.top.color    = violeta,
+      column_labels.border.bottom.color = violeta,
+      stub.background.color = fondo,
+      stub.border.color = violeta,
+      stub.border.width = px(1),
+      table_body.hlines.width =  px(0),
+      table_body.vlines.width = px(0),
+      data_row.padding = px(8),
+      table.font.names = c("Roboto","Helvetica","Arial","sans-serif","Poppins")
+     ) |> 
+    fmt_number(decimals=0,dec_mark = ",",sep_mark = "")
+}
+

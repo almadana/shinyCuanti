@@ -16,7 +16,7 @@ col1f = "#6446fa"
 col2f = "#9bfa82"
 
 library(shiny)
-library(htmlTable)
+library(gt)
 library(tidyverse)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
@@ -315,47 +315,106 @@ shinyServer(function(input, output,session) {
              "descriptivo"=hacerTablaDescriptiva,
              noPlot)
     }) 
-    
+
+# tablas -----------    
   hacerTablaF1 <- function() {
-    x=data()[[1]]
-    n=data()[[3]]
-    a=table(x)
-    b=prop.table(a)
-    a=addmargins(a)
-    b=addmargins(b)
-    d=rbind(a,b)
-    colnames(d)[ncol(d)]="Total"
-    d[2,]=d[2,]*100
-    d=round(d,1)
-    names(attributes(d)$dimnames)<-c("",n)
-    rownames(d)=c("Frecuencia absoluta","Frecuencia Porcentual")
-    htmlTable(d)
+    nombre.x = data()[[3]]
+    df = data()[[6]]
+    
+    tabla = df |> count(.data[[nombre.x]]) |> 
+      mutate(prop = round(100*n / sum(n),2)) |> 
+      rename(num = n)
+    
+    label = attributes(df[[nombre.x]])$label
+    
+    # x=data()[[1]]
+    # n=data()[[3]]
+    # a=table(x)
+    # b=prop.table(a)
+    # a=addmargins(a)
+    # b=addmargins(b)
+    # d=rbind(a,b)
+    # colnames(d)[ncol(d)]="Total"
+    # d[2,]=d[2,]*100
+    # d=round(d,1)
+    # names(attributes(d)$dimnames)<-c("",n)
+    # rownames(d)=c("Frecuencia absoluta","Frecuencia Porcentual")
+     tabla |> gt(rowname_col=nombre.x) |> 
+       cols_label(num = "frecuencia",
+                  prop = "%") |> 
+       grand_summary_rows(
+         #columns = -1,
+         fns = list("Total" = ~sum(.)),
+         formatter = ~fmt_number(., decimals = 0)
+       ) |> 
+       tab_header(
+         title = nombre.x,
+         subtitle = label
+       ) |> 
+       gt_theme_cuanti()
   }
-  #----------------- Tabla bivariada ---------------------
+  #---------------- Tabla bivariada
   hacerTablaF2 <- function() {
-    x1=data()[[1]]
-    n1=data()[[3]]
-    x2=data()[[2]]
-    n2=data()[[4]]
-    a=table(x1,x2,dnn=c(n1,n2))
-    if (input$freq == "porcentuales") {
-      margin = switch(input$margin,"por filas"=1,"por columnas"=2)
-      a=prop.table(a,margin)
-      if (margin==1) {
-        a=addmargins(a,2)
-        colnames(a)[ncol(a)] = "Total"
-      }
-      else {
-        a=addmargins(a,1)
-        rownames(a)[nrow(a)] = "Total"
-      }
-      a=a*100
+    nombre.x = data()[[3]]
+    nombre.y = data()[[4]]
+    df = data()[[6]]
+    
+    tabla = df |> group_by(.data[[nombre.x]],.data[[nombre.y]]) |> 
+      tally() |> pivot_wider(names_from = .data[[nombre.y]],values_from = n,values_fill=0)
+    
+     if (input$freq == "porcentuales") {
+       margin = switch(input$margin,"por filas"=1,"por columnas"=2)
+       
+       if (margin==1) {
+         tabla[,-1] = t(apply(table[,-1], 1, function(x) x/sum(x)))
+         tabla$Total = rowSums(tabla[,-1])
+         tabla[,-1] = 100*tabla[,-1]
+         tabla |>  gt(rowname_col = nombre.x,groupname_col = NULL) |> 
+           tab_header(title="Tabla bivariada") |> 
+           tab_stubhead(label = nombre.x) |>  tab_spanner(label=nombre.y,columns = -any_of("Total") ) |> 
+           # grand_summary_rows(
+           #   #columns = -1,
+           #   fns = list("Total" = ~sum(.)),
+           #   formatter = ~fmt_number(., decimals = 0)) |> 
+           gt_theme_cuanti() |> 
+           fmt_number(decimals = 1,dec_mark = ",")
+           
+    #     a=addmargins(a,2)
+    #     colnames(a)[ncol(a)] = "Total"
+       }
+       else {
+         tabla[,-1] = apply(table[,-1], 2, function(x) x/sum(x))
+         tabla[,-1] = 100*tabla[,-1]
+         tabla |>  gt(rowname_col = nombre.x,groupname_col = NULL) |> 
+           tab_header(title="Tabla bivariada") |> 
+           tab_stubhead(label = nombre.x) |>  tab_spanner(label=nombre.y,columns = everything() ) |> 
+            grand_summary_rows(
+              #columns = -1,
+              fns = list("Total" = ~sum(.)),
+              formatter = ~fmt_number(., decimals = 1)) |> 
+           gt_theme_cuanti() |> 
+           fmt_number(decimals = 1,dec_mark = ",")
+    #     a=addmargins(a,1)
+    #     rownames(a)[nrow(a)] = "Total"
+       }
+    #   a=a*100
     }
-    # colnames(a)[ncol(a)]="Total"
-    # colnames(a)[ncol(a)]="Total"
-    #names(attributes(d)$dimnames)<-c("",n)
-    #rownames(d)=c("Frecuencia absoluta","Frecuencia Porcentual")
-    htmlTable(round(a,1))
+    else {
+      tabla |>  gt(rowname_col = nombre.x,groupname_col = NULL) |> 
+        tab_header(title="Tabla bivariada") |> 
+        tab_stubhead(label = nombre.x) |>  tab_spanner(label=nombre.y,columns = everything() ) |> 
+        # grand_summary_rows(
+        #   #columns = -1,
+        #   fns = list("Total" = ~sum(.)),
+        #   formatter = ~fmt_number(., decimals = 0)) |> 
+        gt_theme_cuanti()  
+    }
+    
+    # # colnames(a)[ncol(a)]="Total"
+    # # colnames(a)[ncol(a)]="Total"
+    # #names(attributes(d)$dimnames)<-c("",n)
+    # #rownames(d)=c("Frecuencia absoluta","Frecuencia Porcentual")
+    # htmlTable(round(a,1))
   }
   
   output$chisq2Text <- renderText({
@@ -477,7 +536,6 @@ shinyServer(function(input, output,session) {
 
       if (input$var2==input$var1) {
         nombre=data()[[3]]
-        tab=table(data()[[1]])
   
         if (input$freq == "porcentuales") {
           p_bar = ggplot(df, aes(x = .data[[nombre.x]])) +
@@ -746,6 +804,10 @@ shinyServer(function(input, output,session) {
     }
     
   
+  output$gtable <- render_gt({
+    funcionDeTabla()()
+  })
+    
   #verDataFrame
   output$dataframe <- DT::renderDataTable({
     print(nrow(data()[[6]]))
@@ -767,6 +829,8 @@ shinyServer(function(input, output,session) {
   output$laTabla <- renderUI({
      HTML(limpiaColspan(funcionDeTabla()()))
   })
+  
+
   
   limpiaColspan <- function(x) {
     gsub("td colspan='[0-9]*'","td colspan='1'",x)
