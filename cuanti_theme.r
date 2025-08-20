@@ -75,7 +75,7 @@ gt_theme_cuanti <- function(gtobj, realce = "#6C3BF6",fondo="#e7e6ff",violeta="#
       table.border.top.color = violeta,
       grand_summary_row.border.color  = violeta,
       grand_summary_row.border.width = px(0),
-      grand_summary_row.background.color = fondo,
+      #grand_summary_row.background.color = fondo,
       column_labels.background.color = fondo,
       column_labels.border.top.color    = violeta,
       column_labels.border.bottom.color = violeta,

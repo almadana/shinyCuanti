@@ -18,6 +18,7 @@ col2f = "#9bfa82"
 library(shiny)
 library(gt)
 library(tidyverse)
+#library(htmlTable)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
 load("./data/serce.RData")
@@ -439,7 +440,9 @@ shinyServer(function(input, output,session) {
     sumario[numericas,"Mediana"] = qtiles[,3]
     sumario[numericas,"Cuartil 3"] = qtiles[,4]
     sumario[,"Moda"] = moda
-    htmlTable(sumario)
+    sumario |> gt(rowname_col = "Variable") |> 
+      gt_theme_cuanti()
+    #htmlTable(sumario)
   }
 
   getmode <- function(v) {
@@ -826,10 +829,10 @@ shinyServer(function(input, output,session) {
   # })
   
   
-  output$laTabla <- renderUI({
-     HTML(limpiaColspan(funcionDeTabla()()))
-  })
-  
+  # output$laTabla <- renderUI({
+  #    HTML(limpiaColspan(funcionDeTabla()()))
+  # })
+  # 
 
   
   limpiaColspan <- function(x) {
