@@ -367,7 +367,7 @@ shinyServer(function(input, output,session) {
        margin = switch(input$margin,"por filas"=1,"por columnas"=2)
        
        if (margin==1) {
-         tabla[,-1] = t(apply(table[,-1], 1, function(x) x/sum(x)))
+         tabla[,-1] = t(apply(tabla[,-1], 1, function(x) x/sum(x)))
          tabla$Total = rowSums(tabla[,-1])
          tabla[,-1] = 100*tabla[,-1]
          tabla |>  gt(rowname_col = nombre.x,groupname_col = NULL) |> 
@@ -384,7 +384,7 @@ shinyServer(function(input, output,session) {
     #     colnames(a)[ncol(a)] = "Total"
        }
        else {
-         tabla[,-1] = apply(table[,-1], 2, function(x) x/sum(x))
+         tabla[,-1] = apply(tabla[,-1], 2, function(x) x/sum(x))
          tabla[,-1] = 100*tabla[,-1]
          tabla |>  gt(rowname_col = nombre.x,groupname_col = NULL) |> 
            tab_header(title="Tabla bivariada") |> 
@@ -441,7 +441,16 @@ shinyServer(function(input, output,session) {
     sumario[numericas,"Cuartil 3"] = qtiles[,4]
     sumario[,"Moda"] = moda
     sumario |> gt(rowname_col = "Variable") |> 
-      gt_theme_cuanti()
+      gt_theme_cuanti() |> 
+      tab_style(style = cell_text(weight="bold"),
+                locations = list(cells_column_labels(everything()),
+                                 cells_stub(everything())) ) |> 
+      fmt_number(decimals = 1,dec_mark = ",",sep_mark = "") |> 
+      sub_missing(missing_text = "---") |> 
+      cols_align(
+        align = "center",
+        columns = everything()
+      )
     #htmlTable(sumario)
   }
 
