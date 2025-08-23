@@ -22,7 +22,7 @@ library(tidyverse)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
 load("./data/serce.RData")
-load("./data/latino.RData")
+#load("./data/latino.RData")
 load("./data/encuesta.RData")
 load("./data/descripciones.RData")
 #load("./data/miniBase.RData")
@@ -239,7 +239,7 @@ shinyServer(function(input, output,session) {
                         "dispersion"=nums)    
       
       updatePickerInput(session, "var1", choices = varsCDs[elegibles1])
-      updatePickerInput(session, "var2", choices = c(varsCDs[elegibles2] ))
+      updatePickerInput(session, "var2", choices = varsCDs[elegibles2] )
     }
     
     #---- actualizar tabla de sumario ----
@@ -343,6 +343,8 @@ shinyServer(function(input, output,session) {
      tabla |> gt(rowname_col=nombre.x) |> 
        cols_label(num = "frecuencia",
                   prop = "%") |> 
+       gt_theme_cuanti() |> 
+       fmt_number(decimals=2, columns=3) |> 
        grand_summary_rows(
          #columns = -1,
          fns = list("Total" = ~sum(.)),
@@ -351,8 +353,7 @@ shinyServer(function(input, output,session) {
        tab_header(
          title = nombre.x,
          subtitle = label
-       ) |> 
-       gt_theme_cuanti()
+       )
   }
   #---------------- Tabla bivariada
   hacerTablaF2 <- function() {
