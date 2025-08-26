@@ -552,7 +552,7 @@ shinyServer(function(input, output,session) {
   
         if (input$freq == "porcentuales") {
           p_bar = ggplot(df, aes(x = .data[[nombre.x]])) +
-            geom_bar(aes(y = after_stat(prop)),col=col2f,fill=col1f) +
+            geom_bar(aes(y = after_stat(count / sum(count)), group = 1),col=col2f,fill=col1f) +
             scale_y_continuous(labels = scales::percent_format(scale = 100)) +
             labs(y = "Porcentaje", title = "Barras porcentuales")
         } else {
