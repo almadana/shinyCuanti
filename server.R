@@ -545,7 +545,7 @@ shinyServer(function(input, output,session) {
       nombre.x = data()[[3]]
       nombre.y = data()[[4]]
       df = data()[[6]]
-    
+      n_levels_y = length(unique(df[[nombre.y]]))
 
       if (input$var2==input$var1) {
         nombre=data()[[3]]
@@ -607,7 +607,13 @@ shinyServer(function(input, output,session) {
         # 
       #qplot(dt,aes_string(x=a,fill=b))+geom_bar(stat="identity",position = position_dodge())
       }
-      show(p_bar + theme_cuanti() + scale_fill_categorical() )
+      if (n_levels_y < 10) {
+        show(p_bar + theme_cuanti() + scale_fill_categorical() )  
+      }
+      else {
+        show(p_bar + theme_cuanti() )
+      }
+      
     }
     hacerBoxplot = function() {
       x = data()[[1]]
