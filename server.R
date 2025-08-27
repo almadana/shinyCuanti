@@ -18,6 +18,7 @@ col2f = "#9bfa82"
 library(shiny)
 library(gt)
 library(tidyverse)
+library(pals)
 #library(htmlTable)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
@@ -607,12 +608,12 @@ shinyServer(function(input, output,session) {
         # 
       #qplot(dt,aes_string(x=a,fill=b))+geom_bar(stat="identity",position = position_dodge())
       }
-      if (n_levels_y < 10) {
-        show(p_bar + theme_cuanti() + scale_fill_categorical() )  
-      }
-      else {
-        show(p_bar + theme_cuanti() )
-      }
+      # if (n_levels_y < 10) {
+      #   show(p_bar + theme_cuanti() + scale_fill_categorical() )  
+      # }
+      # else {
+        show(p_bar + theme_cuanti()  + scale_fill_categorical())
+      # }
       
     }
     hacerBoxplot = function() {

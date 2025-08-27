@@ -20,7 +20,7 @@ theme_cuanti <- function(base_size=16, base_family="Helvetica") {
             legend.key = element_rect(colour = NA),
             legend.position = "bottom",
             legend.direction = "horizontal",
-            legend.key.size= unit(0.2, "cm"),
+            legend.key.size= unit(.6, "cm"),
             legend.spacing = unit(0, "cm"),
             legend.title = element_text(face="italic"),
             plot.margin=unit(c(10,5,5,5),"mm"),
@@ -29,20 +29,44 @@ theme_cuanti <- function(base_size=16, base_family="Helvetica") {
     ))
 }
 
-scale_fill_categorical <- function(...){
-  require(scales)
-  discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
+# --- Paleta: Tableau 20 (hasta 20) -> Glasbey (21+) ---
+cuanti_pal <- function(n, anchor = "#6C3BF6") {
+  pal <-
+    if (n <= 20) {
+      ggthemes::tableau_color_pal("Tableau 20")(n)
+    } else {
+      pals::glasbey(n)  # separa bien 20–80+
+    }
+  pal[1] <- anchor     # anclá el 1º color a tu violeta institucional
+  pal
 }
 
-scale_color_categorical <- function(...){
-  require(scales)
-  discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
+# Escalas discretas (fill y color) usando la paleta de arriba
+scale_fill_categorical <- function(..., na.value = "grey85", guide = "legend") {
+  discrete_scale("fill", "cuanti", palette = cuanti_pal,
+                          na.value = na.value, guide = guide, ...)
+}
+scale_color_categorical <- function(..., na.value = "grey60", guide = "legend") {
+  discrete_scale("colour", "cuanti", palette = cuanti_pal,
+                          na.value = na.value, guide = guide, ...)
 }
 
-    scale_fill_categorical <- function(...){
-  require(scales)
-  discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
-}
+
+
+# scale_fill_categorical <- function(...){
+#   require(scales)
+#   discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
+# }
+# 
+# scale_color_categorical <- function(...){
+#   require(scales)
+#   discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
+# }
+# 
+# scale_fill_categorical <- function(...){
+#   require(scales)
+#   discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
+# }
 
 
 require(gt)
