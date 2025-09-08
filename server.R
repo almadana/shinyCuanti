@@ -522,9 +522,28 @@ shinyServer(function(input, output,session) {
       if (input$tendencia) {
         #abline(lm(y~x))
         p_d = p_d + geom_smooth(method="lm",se=F,col=col2f,size=2)
+        if (input$regresion) {
+          fit <- lm(df[[nombre.y]] ~ df[[nombre.x]])
+          b <- coef(fit)
+          lab <- sprintf("ŷ = %.2f + %.2f·x  |  R² = %.2f", b[1], b[2], summary(fit)$r.squared)
+          p_d = p_d + annotate("text", x = Inf, y = Inf, 
+                               hjust = 1.1, vjust = 1.5, 
+                               label = lab, size=5,
+                               fontface = "bold")          
+        }
       }
       show(p_d)
     }
+    
+    output$regresionCoef <- renderText({
+      df = data()[6]
+      x = data()[[1]]
+      y = data()[[2]]
+      #f = paste0(nombre.y,"~",nombre.x)
+      m = lm(y~x,data=df)
+      c = coef(m)
+      paste("Coeficientes de regresión. \nIntercepto:",round(c[1],2),"| Pendiente:",round(c[2],2))
+    })
     
     output$coefCorrel1 <- renderText({
       df = data()[6]

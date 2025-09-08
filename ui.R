@@ -124,18 +124,18 @@ shinyUI(fluidPage(theme="cuanti.css",
                                        value = 3),
                            checkboxInput("tendencia","Línea de tendencia y coef. de correlación"),
                            conditionalPanel(condition="input.tendencia",
-              
+                             checkboxInput("regresion","Coeficientes de regresión"),
                              tags$p(textOutput("coefCorrel1")),
-                             tags$p(textOutput("pCorrel1"))
-                           )
+                             tags$p(textOutput("pCorrel1")),
+                             conditionalPanel(condition="input.regresion",
+                                              tags$p(textOutput("regresionCoef")))
+                           ),
+                           
           ),
           conditionalPanel("output.anali == 'gbar'",
                            radioButtons("stacked",
                                         "Barras:",
-                                        c("apiladas","no-apiladas")),
-                           radioButtons("leyenda",
-                                        "Leyenda:",
-                                        c("izquierda","derecha"))
+                                        c("apiladas","no-apiladas"))
                            #conditionalPanel(condition="leyenda",
                             #                )
           ),
