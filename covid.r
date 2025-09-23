@@ -68,3 +68,31 @@ tail(covid, 30)
 View(covid)
 
 save(covid, file = "data/covid.RData")
+
+#Generar un diccionario de las variables
+etiquetas <- c(
+  "ID" = "Identificador único",
+  "SEXO" = "Sexo del participante",
+  "EDAD" = "Edad en años",
+  "NSE_TERCILES" = "Nivel socioeconómico",
+  "TIPO_AISLAMIENTO" = "Tipo de aislamiento",
+  "DIAS_AISLAMIENTO" = "Días de aislamiento en el momento de la encuesta",
+  "MIEDO_RETORNO" = "Miedo a retornar a la vida normal",
+  "SINTOMAS_DEPRESIVOS" = "Sintomas depresivos Mayor puntaje = mayor sintomatologia",
+  "SINTOMAS_ANSIEDAD_ESTADO" = "Estado de ansiedad Mayor puntaje = mayor sintomatologia",
+  "SINTOMAS_ANSIEDAD_RASGO" = "Rasgo de ansiedad Mayor puntaje = mayor sintomatologia",
+  "CONSUME_DROGAS" = "¿El participante consume drogas?",
+  "DROGAS_AUMENTO_FRECUENCIA" = "¿Aumentó la frecuencia de consumo de drogas?", 
+  "DROGAS_AUMENTO_VOLUMEN" = "¿Aumentó el volumen de consumo de drogas?",  # ... agrega el resto de variables y sus etiquetas aquí ...
+)
+
+diccionario <- data.frame(
+  var = names(covid),
+  etiqueta = etiqueta[names(covid)],
+  stringsAsFactors = FALSE
+)
+
+# Si alguna variable no tiene etiqueta, quedará como NA. Puedes reemplazar NA por "" si prefieres:
+diccionario$etiquetas[is.na(diccionario$etiquetas)] <- ""
+
+write.csv(diccionario, file = "diccionario_covid.csv", row.names = FALSE)
