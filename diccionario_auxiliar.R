@@ -94,3 +94,43 @@ for (i in seq_len(nrow(dic_tri))) {
 
 # Guardar el objeto con etiquetas
 save(dt, file = "./data/darkTriad.RData")
+
+#Censo Recodificado ----
+load("data/censo_recod.RData")
+etiquetas <- c(
+  "Sexo" = "Sexo del participante",
+  "Edad" = "Edad en años",
+  "Lugar_Nac" = "Lugar de nacimiento",
+  "Dep_Nac" = "Departamento de nacimiento",
+  "País" = "País",
+  "Nro_trabajos" = "Número de trabajos que tiene",
+  "Estado_conyugal" = "Estado conyugal",
+  "Num_hijos" = "Número de hijos",
+  "Posición_Ocupacional" = "Tipo de trabajo que tiene",
+  "Único_percibe_ingresos_hogar" = "¿Único percibe ingresos en el hogar?",
+  "Vivienda_Ud_es" = "Condición de tenencia de vivienda",
+  "ocupacion_grupo" = "Grupo de ocupación según OIT",
+  "Área_inserción" = "Área de inserción agrupada"
+)
+
+# Generar diccionario para Censo Recodificado
+dic_censo_recod <- data.frame(
+  var = names(censoRec),
+  etiquetas = ifelse(is.na(etiquetas[names(censoRec)]), "", 
+                     as.character(etiquetas[names(censoRec)])),
+  stringsAsFactors = FALSE
+)
+
+# Asignar etiquetas como atributo label cuando existan
+for (i in seq_len(nrow(dic_censo_recod))) {
+  var_name <- dic_censo_recod$var[i]
+  label <- dic_censo_recod$etiquetas[i]
+  if (var_name %in% names(censoRec) && !is.na(label) && label != "") {
+    attr(censoRec[[var_name]], "label") <- label
+  }
+}
+
+# Guardar el objeto con etiquetas
+save(censoRec, file = "./data/censo_recod.RData")
+write.csv(dic_censo_recod, file = "./data/diccionario_censo_recod.csv", 
+          row.names = FALSE)
