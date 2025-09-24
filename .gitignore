@@ -1,5 +1,6 @@
 *.sav
 *.csv
+!diccionario_covid.csv
 *.7z
 *.rar
 *.zip
