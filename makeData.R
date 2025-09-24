@@ -11,6 +11,9 @@ View(dt)
 sum(is.na(dt$Refleja2))
 dt=dt[complete.cases(dt),]
 save(dt,file='./data/darkTriad.RData')
+
+
+
 # SERCE ----
 serce=read.spss('../data/serce/SERCE - Uruguay - sin missing.sav',to.data.frame = T)
 serce2=read_sav('../data/serce/SERCE - Uruguay - sin missing.sav')
@@ -429,3 +432,65 @@ if (exists("add_labels")) {
 }
 aristas=datos_final
 save(aristas, file = "./data/Aristas.RData")
+
+
+#Covid ----
+
+# Asignar etiquetas como atributos label a las variables de covid
+diccionario <- read.csv("diccionario_covid.csv", stringsAsFactors = FALSE)
+for (i in seq_len(nrow(diccionario))) {
+  var_name <- diccionario$var[i]
+  label <- diccionario$etiquetas[i]
+  if (var_name %in% names(covid) && label != "") {
+    attr(covid[[var_name]], "label") <- label
+  }
+}
+
+# Guardar el dataframe con etiquetas
+save(covid, file = "data/covid.RData")
+
+# Cargar el archivo
+load("data/covid.RData")
+
+# Ver los nombres de las variables
+names(covid)
+
+# Ver la etiqueta de una variable específica, por ejemplo SEXO
+attr(covid$SEXO, "label")
+
+# O ver todas las etiquetas de todas las variables
+sapply(covid, function(x) attr(x, "label"))
+
+# ---- Triada Oscura: generar y aplicar diccionario ----
+# Vector de etiquetas (puedes completar las que correspondan a cada variable de dt)
+# Si ya definiste 'etiquetas' arriba, se usará; si definiste 'etiquetas_tri', también se respetará
+if (exists("etiquetas_tri") && length(etiquetas_tri) > 0) {
+  etq_src <- etiquetas_tri
+} else if (exists("etiquetas") && length(etiquetas) > 0) {
+  etq_src <- etiquetas
+} else {
+  etq_src <- c()
+}
+
+# Generar diccionario para Triada Oscura
+
+dic_tri <- data.frame(
+  var = names(dt),
+  etiquetas = ifelse(is.na(etq_src[names(dt)]), "", as.character(etq_src[names(dt)])),
+  stringsAsFactors = FALSE
+)
+
+# Guardar diccionario como CSV
+write.csv(dic_tri, file = "./data/diccionario_darkTriad.csv", row.names = FALSE)
+
+# Asignar etiquetas como atributo label cuando existan
+for (i in seq_len(nrow(dic_tri))) {
+  var_name <- dic_tri$var[i]
+  label <- dic_tri$etiquetas[i]
+  if (var_name %in% names(dt) && !is.na(label) && label != "") {
+    attr(dt[[var_name]], "label") <- label
+  }
+}
+
+# Guardar el objeto con etiquetas
+save(dt, file = "./data/darkTriad.RData")
