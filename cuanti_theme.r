@@ -24,8 +24,8 @@ theme_cuanti <- function(base_size=16, base_family="Helvetica") {
             legend.spacing = unit(0, "cm"),
             legend.title = element_text(face="italic"),
             plot.margin=unit(c(10,5,5,5),"mm"),
-            strip.background=element_rect(colour="#f0f0f0",fill="#f0f0f0"),
-            strip.text = element_text(face="bold")
+            strip.background=element_rect(colour="#f0f0f0",fill="#b4a5fa"),
+            strip.text = element_text(face="bold",colour = "#f0f0f0")
     ))
 }
 
@@ -43,11 +43,11 @@ cuanti_pal <- function(n, anchor = "#6C3BF6") {
 
 # Escalas discretas (fill y color) usando la paleta de arriba
 scale_fill_categorical <- function(..., na.value = "grey85", guide = "legend") {
-  discrete_scale("fill", "cuanti", palette = cuanti_pal,
+  discrete_scale("fill", palette = cuanti_pal,
                           na.value = na.value, guide = guide, ...)
 }
 scale_color_categorical <- function(..., na.value = "grey60", guide = "legend") {
-  discrete_scale("colour", "cuanti", palette = cuanti_pal,
+  discrete_scale("colour", palette = cuanti_pal,
                           na.value = na.value, guide = guide, ...)
 }
 
