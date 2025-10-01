@@ -71,6 +71,6 @@ datos <- datos %>%
   select(-Área_inser_1)
 
 # Crear objeto final y guardar
-censoRec <- datos
-save(censoRec, file = "/home/usuario/shinyCuanti/data/censo_recod.RData")
-write.csv(censoRec, "/home/usuario/shinyCuanti/data/censo_recod.csv", row.names = FALSE)
+censoFil <- datos
+save(censoFil, file = "./data/censo.RData")
+#write.csv(censoRec, "/home/usuario/shinyCuanti/data/censo_recod.csv", row.names = FALSE)
