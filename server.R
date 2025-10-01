@@ -221,6 +221,7 @@ shinyServer(function(input, output,session) {
       elegibles1=switch(input$analisis,
                         "ver"=NULL,
                         "descriptivo"=NULL,
+                        "descat"=nums,
                         "histograma"=nums,
                         "tablaF1"=!nums,
                         "tablaF2"=!nums,
@@ -231,6 +232,7 @@ shinyServer(function(input, output,session) {
       elegibles2=switch(input$analisis,
                         "ver"=NULL,
                         "descriptivo"=NULL,
+                        "descat"=!nums,
                         "histograma"=NULL,
                         "tablaF1"=NULL,
                         "tablaF2"=!nums,
@@ -315,6 +317,7 @@ shinyServer(function(input, output,session) {
              "tablaF1"=hacerTablaF1,
              "tablaF2"=hacerTablaF2,
              "descriptivo"=hacerTablaDescriptiva,
+             "descat"=hacerDesCat,
              noPlot)
     }) 
 
@@ -454,6 +457,23 @@ shinyServer(function(input, output,session) {
         columns = everything()
       )
     #htmlTable(sumario)
+  }
+  
+  hacerDesCat <- function() {
+    df = data()[[6]] # el data frame posta
+    nombre.x = data()[[3]] # nombre de variable para la cual calcular descriptivas
+    nombre.y = data()[[4]] # nombre de la variable de categorías
+    
+    df |> group_by(.data[[nombre.y]]) |> 
+      summarize(media = mean(.data[[nombre.x]],na.rm=T),
+                desvío = sd(.data[[nombre.x]],na.rm=T),
+                'Cuartil 1' = quantile(.data[[nombre.x]],.25,na.rm=T),
+                mediana = quantile(.data[[nombre.x]],.5,na.rm=T),
+                'Cuartil 3' = quantile(.data[[nombre.x]],.75,na.rm=T)
+                ) |> 
+      gt() |> tab_stubhead(label = nombre.y) |> 
+      gt_theme_cuanti() |> fmt_number(decimals=2) |> tab_header(title=nombre.x)
+    
   }
 
   getmode <- function(v) {

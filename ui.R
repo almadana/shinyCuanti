@@ -62,6 +62,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                            pickerInput("analisis","Elegir análisis",
                                        c("Ver datos"="ver",
                                          "Descriptivo"="descriptivo",
+                                         "Descriptivas por categorías"="descat",
                                          "Histograma"="histograma",
                                          "Tabla de frecuencias univariada"="tablaF1",
                                          "Tabla de frecuencias bivariada"="tablaF2",
@@ -174,7 +175,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                            
                            
           
-          conditionalPanel(condition="output.anali == 'tablaF1' || output.anali == 'tablaF2' || output.anali == 'descriptivo' ",
+          conditionalPanel(condition="output.anali == 'tablaF1' || output.anali == 'tablaF2'|| output.anali == 'descat'  || output.anali == 'descriptivo' ",
                            #htmlOutput("laTabla")),
                            gt_output("gtable")),
           
