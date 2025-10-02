@@ -56,11 +56,15 @@ niveles_bs = list("Si","No")
 
 niveles_pc = list("Si","No","Ns/Nc")
 
+niveles_ctspc = list("Si","No")
 
 
 endis = endis |> 
-  # mutate(across(starts_with("AP",ignore.case = F),
-  #               ~ factor(.x, levels = 1:5, labels = niveles_ap))) |> 
+  mutate(across(starts_with("CTSPC",ignore.case = F),
+                 \(x) {
+                   n_levs = max(x,na.rm=T)
+                   factor(x, levels = 0:n_levs, labels = c("No",rep("Si",n_levs))) }
+                )) |> 
   # mutate(across(starts_with("BS",ignore.case = F),
   #               ~ factor(.x, levels = 1:2, labels = niveles_bs))) |> 
   # mutate(across(starts_with("PC",ignore.case = F),
