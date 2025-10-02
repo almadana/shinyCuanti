@@ -23,6 +23,7 @@ library(pals)
 load("./data/censo.RData")
 load("./data/darkTriad.RData")
 load("./data/serce.RData")
+load("./data/covid.RData")
 #load("./data/latino.RData")
 load("./data/encuesta.RData")
 load("./data/descripciones.RData")
@@ -59,7 +60,7 @@ shinyServer(function(input, output,session) {
   #"serce","Tríada oscura"="triada","Latinobarómetro"="latinoBaro1","Censo Nacional de Psicólogos"="censo"),
   listaDeDatos = list("endis"=endis,"wvs"=wvs,"censo"=censoFil,"triada"=dt,"serce"=serce,#"latinoBaro1"=latino,
                       "encuestaCuanti"=encuesta1,#"miniBase"=miniBase,"expeCuna"=music1,"inteligencia"=inteli,"riqueza"=wealth3
-                      "aristas"=aristas)
+                      "aristas"=aristas,"covid"=covid)
   muestra <- NULL
   
   
