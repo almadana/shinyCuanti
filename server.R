@@ -223,6 +223,7 @@ shinyServer(function(input, output,session) {
                         "descriptivo"=NULL,
                         "descat"=nums,
                         "histograma"=nums,
+                        "histocat"=nums,
                         "tablaF1"=!nums,
                         "tablaF2"=!nums,
                         "gbar"=!nums,
@@ -234,6 +235,7 @@ shinyServer(function(input, output,session) {
                         "descriptivo"=NULL,
                         "descat"=!nums,
                         "histograma"=NULL,
+                        "histocat"=!nums,
                         "tablaF1"=NULL,
                         "tablaF2"=!nums,
                         "gbar"=!nums,
@@ -304,6 +306,7 @@ shinyServer(function(input, output,session) {
     funcionDePloteo <-eventReactive(input$goButton,{
       switch(input$analisis,
              "histograma"=hacerHistograma,
+             "histocat"=hacerHistocat,
              "boxplot"=hacerBoxplot,
              "gbar"=hacerGrafBarras,
              "intconf"=hacerIntervalo,
@@ -507,7 +510,7 @@ shinyServer(function(input, output,session) {
         
         p_h = ggplot(df,aes(x=.data[[nombre]])) + geom_histogram(aes(y=..density..),bins = n_bins,fill=col1f,col=col2f) + 
           labs(x = nombre,
-               y = "densitdad",
+               y = "densidad",
                title = titulo) + 
           theme_cuanti()
         
@@ -524,6 +527,37 @@ shinyServer(function(input, output,session) {
         
       }
       show(p_h)
+    }
+    
+    hacerHistocat = function() {
+      nombre.x = data()[[3]]
+      nombre.y = data()[[4]]
+      df = data()[[6]] # el data frame posta
+      if (input$superpuestas == "superpuestos") {
+        ph = ggplot(df,aes(x=.data[[nombre.x]],fill=.data[[nombre.y]]))  + labs(x=nombre.x,fill=nombre.y)  + 
+          theme_cuanti() + scale_fill_categorical()
+        
+        if (input$normalizar == "si") {
+          ph + geom_histogram(aes(y=..density..)) + ylab("Densidad")
+        }
+        else {
+          ph + geom_histogram() + ylab("Frecuencia")
+        }
+          
+      }
+      
+      else {
+        ph = ggplot(df,aes(x=.data[[nombre.x]]))  + labs(x=nombre.x,fill=nombre.y)  + 
+          facet_wrap(~.data[[nombre.y]])+
+          theme_cuanti() + scale_fill_categorical()
+        if (input$normalizar == "si") {
+          ph + geom_histogram(aes(y=..density..),fill=col1f,col=col2f) + ylab("Densidad")
+        }
+        else {
+          ph + geom_histogram(fill=col1f,col=col2f) + ylab("Frecuencia")
+        }
+      }
+      
     }
 
     hacerDispersion = function() {

@@ -64,6 +64,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                                          "Descriptivo"="descriptivo",
                                          "Descriptivas por categorías"="descat",
                                          "Histograma"="histograma",
+                                         "Histograma por categorías"="histocat",
                                          "Tabla de frecuencias univariada"="tablaF1",
                                          "Tabla de frecuencias bivariada"="tablaF2",
                                          "Gráfico de barras"="gbar",
@@ -117,6 +118,18 @@ shinyUI(fluidPage(theme="cuanti.css",
                            value = 30),
             checkboxInput("ajusteNormal",label="Ajustar curva normal")
           ), 
+          conditionalPanel(condition="output.anali == 'histocat'",
+                           radioButtons("superpuestas",
+                                       "Mostrar histogramas",
+                                       c("superpuestos","separados")),
+                           #checkboxInput("ajusteNormal",label="Ajustar curva normal")
+          ),
+          conditionalPanel(condition="output.anali == 'histocat'",
+                           radioButtons("normalizar",
+                                        "Normalizar frecuencias",
+                                        c("no","si")),
+                           #checkboxInput("ajusteNormal",label="Ajustar curva normal")
+          ),
           conditionalPanel(condition="output.anali == 'dispersion'",
                            sliderInput("pointSize",
                                        "Tamaño de puntos:",
@@ -180,7 +193,7 @@ shinyUI(fluidPage(theme="cuanti.css",
                            gt_output("gtable")),
           
           
-          conditionalPanel("output.anali == 'histograma' || output.anali == 'gbar' || output.anali == 'boxplot' || output.anali == 'intconf'|| output.anali == 'dispersion'",
+          conditionalPanel("output.anali == 'histograma' || output.anali == 'histocat' || output.anali == 'gbar' || output.anali == 'boxplot' || output.anali == 'intconf'|| output.anali == 'dispersion'",
                            plotOutput("elPlot")
     #                       textOutput("mensaje")
           )
