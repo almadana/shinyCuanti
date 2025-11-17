@@ -255,7 +255,7 @@ shinyUI(fluidPage(theme="cuanti.css",
              ),
              mainPanel(
                plotOutput("distriPlot"),
-               htmlOutput("distriTable")
+               gt_output("distriTable")
              )
            )
          )

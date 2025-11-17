@@ -985,7 +985,7 @@ shinyServer(function(input, output,session) {
         index_small_k = x <= small_k
         alphaValues[ ! (index_big_k | index_small_k) ] = 0 
       }
-      barplot(alphaValues,col = "red",ylim = c(0,1.3*max(valores)))
+      barplot(alphaValues,col = col2f,border=col1f ,ylim = c(0,1.3*max(valores)))
       mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
 
     }
@@ -1016,14 +1016,14 @@ shinyServer(function(input, output,session) {
           index_t = x<=t
         }
         alphaValues[!(index_t)]=0
-        polygon(c(x[index_t],t),c(valores[index_t],0),col="red")
+        polygon(c(x[index_t],t),c(valores[index_t],0),col=col2f)
       }
       else {
         index_low_t = x<=t_1
         index_high_t = x>=big_t
         alphaValues[! (index_low_t | index_high_t)] = 0
-        polygon(c(x[index_high_t],x[which(index_high_t)[1]]),c(valores[index_high_t],0),col="red")
-        polygon(c(x[index_low_t],x[tail(which(index_low_t),1)]),c(valores[index_low_t],0),col="red")
+        polygon(c(x[index_high_t],x[which(index_high_t)[1]]),c(valores[index_high_t],0),col=col2f)
+        polygon(c(x[index_low_t],x[tail(which(index_low_t),1)]),c(valores[index_low_t],0),col=col2f)
       }
       mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
       
@@ -1041,7 +1041,7 @@ shinyServer(function(input, output,session) {
       chisq=input$chisq
       index_chisq = x >=chisq
       alphaValues[!(index_chisq)]=0
-      polygon(c(x[index_chisq],chisq),c(valores[index_chisq],0),col="red")
+      polygon(c(x[index_chisq],chisq),c(valores[index_chisq],0),col=col2f)
       mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
     }
   }
@@ -1074,14 +1074,14 @@ shinyServer(function(input, output,session) {
           index_z = x<=z
         }
         alphaValues[!(index_z)]=0
-        polygon(c(x[index_z],z),c(valores[index_z],0),col="red")
+        polygon(c(x[index_z],z),c(valores[index_z],0),col=col2f)
       }
       else {
         index_low_z = x<=z_1
         index_high_z = x>=big_z
         alphaValues[! (index_low_z | index_high_z)] = 0
-        polygon(c(x[index_high_z],x[which(index_high_z)[1]]),c(valores[index_high_z],0),col="red")
-        polygon(c(x[index_low_z],x[tail(which(index_low_z),1)]),c(valores[index_low_z],0),col="red")
+        polygon(c(x[index_high_z],x[which(index_high_z)[1]]),c(valores[index_high_z],0),col=col2f)
+        polygon(c(x[index_low_z],x[tail(which(index_low_z),1)]),c(valores[index_low_z],0),col=col2f)
       }
       mtext(paste("El p-valor es:",round(sum(alphaValues),4)),1)
     }
@@ -1089,7 +1089,7 @@ shinyServer(function(input, output,session) {
     
   #--- Funciones de tabulado de distribuciones----
   output$distriTable <- renderUI({
-    HTML(funcionDeTablaDistri()())
+    funcionDeTablaDistri()()
   })
   
   funcionDeTablaDistri <- reactive({
@@ -1106,7 +1106,10 @@ shinyServer(function(input, output,session) {
     n=input$nBin
     k=0:n
     probabilidades = round(dbinom(k,size=n,prob = p),4)
-    htmlTable(cbind(k,probabilidades))
+    data.frame(k,probabilidades) |> 
+      gt() |> 
+      gt_theme_cuanti() |> 
+      fmt_number(decimals = 5,columns=2)
   }
   
   tablaStudent <- function() {
