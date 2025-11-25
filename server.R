@@ -620,7 +620,7 @@ shinyServer(function(input, output,session) {
       nombre.x = data()[[3]]
       nombre.y = data()[[4]]
       df = data()[[6]]
-      n_levels_y = length(unique(df[[nombre.y]]))
+      n_levels_x = length(unique(df[[nombre.x]]))
 
       if (input$var2==input$var1) {
         nombre=data()[[3]]
@@ -682,12 +682,19 @@ shinyServer(function(input, output,session) {
         # 
       #qplot(dt,aes_string(x=a,fill=b))+geom_bar(stat="identity",position = position_dodge())
       }
-      # if (n_levels_y < 10) {
-      #   show(p_bar + theme_cuanti() + scale_fill_categorical() )  
-      # }
-      # else {
-        show(p_bar + theme_cuanti()  + scale_fill_categorical())
-      # }
+       if (n_levels_x < 8) {
+          show(p_bar + theme_cuanti() + scale_fill_categorical() )
+       }
+       else {
+        show(p_bar + theme_cuanti()  + scale_fill_categorical() + 
+           theme(
+             axis.text.x = element_text(
+               angle = 45,
+               hjust = 1,
+               vjust = 1
+             )
+           ))
+       }
       
     }
     hacerBoxplot = function() {
@@ -935,7 +942,7 @@ shinyServer(function(input, output,session) {
   
   output$elPlot <- renderPlot({
     funcionDePloteo()()
-  })
+  },height=700)
   
   
 #--- Funciones de ploteo de distribuciones----  
